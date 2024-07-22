@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const db = require("../utils/db");
+const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 
 const JWT_SECRET =
@@ -42,10 +43,10 @@ exports.signup = async (req, res) => {
       try {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+        const user_id = uuidv4();
         db.query(
-          "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-          [name, email, hashedPassword],
+          "INSERT INTO users (user_id,name, email, password) VALUES (?, ?, ?,?)",
+          [user_id,name, email, hashedPassword],
           (err, results) => {
             if (err) {
               console.error("Error inserting user:", err);
@@ -54,7 +55,7 @@ exports.signup = async (req, res) => {
                 .send("An error occurred while adding the user.");
             }
 
-            res.json({ id: results.insertId, name, email });
+            res.json({ user_id: results.insertId, name, email });
           }
         );
       } catch (error) {
