@@ -1,5 +1,3 @@
-
-
 const db = require("../utils/db");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
@@ -16,7 +14,7 @@ const ensureDirectoryExists = (dirPath) => {
 // Path to store uploaded files
 const uploadsDir = path.join(__dirname, "../uploads");
 ensureDirectoryExists(uploadsDir);
-console.log(uploadsDir,"uploadsDir")
+console.log(uploadsDir, "uploadsDir");
 // Set up storage engine for Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -30,7 +28,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage }).array("images", 10);
 
-
 const uploadFiles = (req) => {
   return new Promise((resolve, reject) => {
     upload(req, {}, (err) => {
@@ -43,9 +40,7 @@ const uploadFiles = (req) => {
   });
 };
 
-
-
-
+//insert into product
 
 exports.createProduct = async (req, res) => {
   try {
@@ -61,7 +56,7 @@ exports.createProduct = async (req, res) => {
       unit_price: req.body.unit_price.trim(),
       product_id: uuidv4(),
       barcode: uuidv4(), // Generate unique barcode using uuidv4
-      images: JSON.stringify(files.map((file) => file.path))
+      images: JSON.stringify(files.map((file) => file.path)),
     };
 
     // Explicitly list column names with correct field names
@@ -76,7 +71,7 @@ exports.createProduct = async (req, res) => {
       product.unit_price,
       product.product_id,
       product.barcode,
-      product.images
+      product.images,
     ];
 
     db.query(sql, values, (err, result) => {
@@ -84,13 +79,53 @@ exports.createProduct = async (req, res) => {
         console.error("Database Error:", err);
         console.error("SQL Query:", sql);
         console.error("Product Data:", product);
-        return res.status(500).json({ error: "Failed to add product", details: err.message });
+        return res
+          .status(500)
+          .json({ error: "Failed to add product", details: err.message });
       }
       res.status(201).json({ message: "Product added successfully" });
     });
-
   } catch (err) {
     console.error("Upload Error:", err);
     res.status(500).json({ error: "Failed to upload files" });
   }
+};
+
+// Get all products
+exports.getAllProducts = (req, res) => {
+  const sql = "SELECT * FROM products";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to retrieve products" });
+    }
+    res.status(200).json(results);
+  });
+};
+
+// Controller to get product by barcode
+exports.getProductByBarcode = (req, res) => {
+  // Log the request body to ensure it's being received
+  console.log("Request Body:", req.body);
+  // Extract the barcode from the JSON body
+  const { barcode } = req.body;
+  console.log("Barcode received:", barcode);
+  if (!barcode) {
+    return res.status(400).json({ error: "Barcode is required" });
+  }
+  const sql = "SELECT * FROM products WHERE barcode = ?";
+  db.query(sql, [barcode], (err, results) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to retrieve product" });
+    }
+    console.log("Query Results:", results);
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    const product = results[0];
+    product.images = JSON.parse(product.images); // Assuming images are stored as JSON
+    res.status(200).json(product);
+  });
 };
