@@ -13,30 +13,22 @@ const createTables = () => {
   `;
 
   const createUsersTable = `
-  CREATE TABLE IF NOT EXISTS users (
-    user_id VARCHAR(255) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
-  );
-`;
+    CREATE TABLE IF NOT EXISTS users (
+      user_id VARCHAR(255) PRIMARY KEY,
+      name VARCHAR(255) NOT NULL UNIQUE,
+      email VARCHAR(255) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL
+    );
+  `;
 
-//   db.query(createProductsTable, (err, result) => {
-//     if (err) {
-//       console.error("Error creating products table:", err);
-//       return;
-//     }
-//     console.log("Products table created or already exists.");
-//     // Properly close the connection if you need to
-//     db.getConnection().end((err) => {
-//       if (err) {
-//         console.error("Error closing the database connection:", err);
-//       } else {
-//         console.log("Database connection closed.");
-//       }
-//     });
-//   });
-  // };
+  const createSuppliersTable = `
+    CREATE TABLE IF NOT EXISTS suppliers (
+      user_id VARCHAR(255) PRIMARY KEY,
+      SupplierDescription VARCHAR(255) NOT NULL,
+      SupplierAddress VARCHAR(255) NOT NULL
+    );
+  `;
+
   db.query(createProductsTable, (err, result) => {
     if (err) {
       console.error("Error creating products table:", err);
@@ -44,27 +36,27 @@ const createTables = () => {
     }
     console.log("Products table created or already exists.");
 
-    db.query(createUsersTable, (err, result) => {
+    db.query(createSuppliersTable, (err, result) => {
       if (err) {
-        console.error("Error creating users table:", err);
+        console.error("Error creating suppliers table:", err);
         return;
       }
-      console.log("Users table created or already exists.");
+      console.log("Suppliers table created or already exists.");
 
-      // Properly close the connection if you need to
-      db.getConnection().end((err) => {
+      db.query(createUsersTable, (err, result) => {
         if (err) {
-          console.error("Error closing the database connection:", err);
-        } else {
-          console.log("Database connection closed.");
+          console.error("Error creating users table:", err);
+          return;
         }
+        console.log("Users table created or already exists.");
+
+        // If using a connection pool, you don't need to explicitly close it here
+        // You can manage the pool closing when your application shuts down
       });
     });
   });
 };
 
-// createTables();
+module.exports = createTables;
 
 createTables();
-
-

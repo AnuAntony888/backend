@@ -1,4 +1,3 @@
-
 const mysql = require("mysql");
 
 const dbConfig = {
@@ -41,5 +40,10 @@ module.exports = {
     }
     connection.query(sql, params, callback);
   },
-  getConnection: () => connection
+  getConnection: () => connection,
+  end: (callback) => {
+    if (connection) {
+      connection.end(callback);
+    }
+  }
 };
