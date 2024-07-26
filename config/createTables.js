@@ -28,6 +28,19 @@ const createTables = () => {
       SupplierAddress VARCHAR(255) NOT NULL
     );
   `;
+  const createIteamTable = `
+  CREATE TABLE IF NOT EXISTS iteamTabele (
+    user_id VARCHAR(255) PRIMARY KEY,
+     ItemCode VARCHAR(255) NOT NULL,
+    ItemDescription VARCHAR(255) NOT NULL,
+     ItemSupplier VARCHAR(255) NOT NULL,
+      ItemUnit VARCHAR(255) NOT NULL,
+        ItemTax VARCHAR(255) NOT NULL,
+        IteamDiscount VARCHAR(255) NOT NULL,
+              IteamPrice VARCHAR(255) NOT NULL
+    
+  );
+`;
 
   db.query(createProductsTable, (err, result) => {
     if (err) {
@@ -49,9 +62,14 @@ const createTables = () => {
           return;
         }
         console.log("Users table created or already exists.");
-
-        // If using a connection pool, you don't need to explicitly close it here
-        // You can manage the pool closing when your application shuts down
+        db.query(createIteamTable, (err, result) => {
+          if (err) {
+            console.error("Error creating users table:", err);
+            return;
+          }
+          console.log("Users table created or already exists.");
+        })
+        
       });
     });
   });

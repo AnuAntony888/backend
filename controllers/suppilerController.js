@@ -46,35 +46,67 @@ exports.createSupplier = async (req, res) => {
   };
 
 {/********************get supplier using userid**********************************/}
-exports.getSupplierById = (req, res) => {
+
+  exports.getSupplierById = (req, res) => {
     // Log the request body to ensure it's being received
     console.log("Request Body:", req.body);
-    
-    // Extract the user_id from the JSON body
+    // Extract the barcode from the JSON body
     const { user_id } = req.body;
-    console.log("User ID received:", user_id);
-    
+    console.log("Barcode received:", user_id);
     if (!user_id) {
-      return res.status(400).json({ error: "User ID is required" });
+      return res.status(400).json({ error: "Barcode is required" });
     }
-    
     const sql = "SELECT * FROM suppliers WHERE user_id = ?";
     db.query(sql, [user_id], (err, results) => {
       if (err) {
         console.error("Database Error:", err);
-        return res.status(500).json({ error: "Failed to retrieve supplier" });
+        return res.status(500).json({ error: "Failed to retrieve product" });
       }
-      
       console.log("Query Results:", results);
       if (results.length === 0) {
-        return res.status(404).json({ error: "Supplier not found" });
+        return res.status(404).json({ error: "Product not found" });
       }
-      
       const supplier = results[0];
       res.status(200).json(supplier);
     });
   };
+  
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   {/***************update supplier using userid**********************************/}
   exports.updateSupplier = (req, res) => {
     // Log the request body to ensure it's being received
@@ -141,3 +173,17 @@ exports.getSupplierById = (req, res) => {
     });
   };
   
+
+
+  // Get all Supplier
+exports.getAllSupplier = (req, res) => {
+  const sql = "SELECT * FROM suppliers";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to retrieve products" });
+    }
+    res.status(200).json(results);
+  });
+};
