@@ -6,6 +6,7 @@ const path = require("path");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const supplierRoutes = require('./routes/supplierRoutes');
+const itemRoutes=require('./routes/itemRoutes')
 const corsOptions = require("./config/cors");
 require("./config/createTables"); // Import and execute the table creation script
 const app = express();
@@ -20,6 +21,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/supplier", supplierRoutes); 
+app.use("/api/item",itemRoutes); 
 // Route for root URL
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");

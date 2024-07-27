@@ -31,13 +31,13 @@ const createTables = () => {
   const createIteamTable = `
   CREATE TABLE IF NOT EXISTS iteamTabele (
     user_id VARCHAR(255) PRIMARY KEY,
-     ItemCode VARCHAR(255) NOT NULL,
+    ItemCode VARCHAR(255) NOT NULL,
     ItemDescription VARCHAR(255) NOT NULL,
-     ItemSupplier VARCHAR(255) NOT NULL,
-      ItemUnit VARCHAR(255) NOT NULL,
-        ItemTax VARCHAR(255) NOT NULL,
-        IteamDiscount VARCHAR(255) NOT NULL,
-              IteamPrice VARCHAR(255) NOT NULL
+    ItemSupplier VARCHAR(255) NOT NULL,
+    ItemUnit VARCHAR(255) NOT NULL,
+    ItemTax VARCHAR(255) NOT NULL,
+    IteamDiscount VARCHAR(255) NOT NULL,
+    IteamPrice VARCHAR(255) NOT NULL
     
   );
 `;
