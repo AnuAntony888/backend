@@ -33,7 +33,7 @@ const createTables = () => {
     user_id VARCHAR(255) PRIMARY KEY,
     ItemCode VARCHAR(255) NOT NULL,
     ItemDescription VARCHAR(255) NOT NULL,
-    ItemSupplier VARCHAR(255) NOT NULL,
+     ItemSupplier JSON, 
     ItemUnit VARCHAR(255) NOT NULL,
     ItemTax VARCHAR(255) NOT NULL,
     IteamDiscount VARCHAR(255) NOT NULL,
