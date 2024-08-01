@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const db = require("../utils/db"); // Ensure you have a proper db connection setup
 
+
 exports.createIteame = async (req, res) => {
   try {
     // Extract the data from the request body
@@ -12,6 +13,7 @@ exports.createIteame = async (req, res) => {
       ItemTax,
       IteamDiscount,
       IteamPrice,
+      Iteamstock
     } = req.body;
 
     // Validate required fields for inserting
@@ -21,7 +23,8 @@ exports.createIteame = async (req, res) => {
       !ItemUnit ||
       !ItemTax ||
       !IteamDiscount ||
-      !IteamPrice
+      !IteamPrice ||
+      !Iteamstock
     ) {
       return res
         .status(400)
@@ -35,7 +38,7 @@ exports.createIteame = async (req, res) => {
 
     // Check if ItemCode exists
     const checkSql = `SELECT * FROM iteamTabele WHERE ItemCode = ?`;
-    db.query(checkSql, [ItemCode], async (err, rows) => {
+    db.query(checkSql, [ItemCode], (err, rows) => {
       if (err) {
         console.error("Error:", err);
         return res
@@ -61,7 +64,8 @@ exports.createIteame = async (req, res) => {
             ItemUnit = ?, 
             ItemTax = ?, 
             IteamDiscount = ?, 
-            IteamPrice = ?
+            IteamPrice = ?,
+            Iteamstock = ?
           WHERE ItemCode = ?
         `;
         const updateValues = [
@@ -71,7 +75,8 @@ exports.createIteame = async (req, res) => {
           ItemTax,
           IteamDiscount,
           IteamPrice,
-          ItemCode,
+          Iteamstock,
+          ItemCode
         ];
 
         db.query(updateSql, updateValues, (err, result) => {
@@ -88,19 +93,20 @@ exports.createIteame = async (req, res) => {
         // If ItemCode does not exist, insert a new record
         const insertSql = `
           INSERT INTO iteamTabele (
-            user_id,
+            product_id,
             ItemCode,
             ItemDescription,
             ItemSupplier,
             ItemUnit,
             ItemTax,
             IteamDiscount,
-            IteamPrice
+            IteamPrice,
+            Iteamstock
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const insertValues = [
-          uuidv4(), // Generate a new UUID for user_id or get from req.body if provided
+          uuidv4(), // Generate a new UUID for product_id
           ItemCode,
           ItemDescription,
           JSON.stringify(newSuppliers), // Convert to JSON string
@@ -108,6 +114,7 @@ exports.createIteame = async (req, res) => {
           ItemTax,
           IteamDiscount,
           IteamPrice,
+          Iteamstock
         ];
 
         db.query(insertSql, insertValues, (err, result) => {
@@ -129,6 +136,7 @@ exports.createIteame = async (req, res) => {
       .json({ error: "Failed to process item", details: err.message });
   }
 };
+
 {
   /*****************************************************************8 */
 }
@@ -169,7 +177,7 @@ exports.updateItem = (req, res) => {
     ItemUnit,
     ItemTax,
     IteamDiscount,
-    IteamPrice,
+    IteamPrice,Iteamstock,
   } = req.body;
 
   // Validate required fields for inserting
@@ -179,7 +187,8 @@ exports.updateItem = (req, res) => {
     !ItemUnit ||
     !ItemTax ||
     !IteamDiscount ||
-    !IteamPrice
+    !IteamPrice || 
+    !Iteamstock
   ) {
     return res
       .status(400)
@@ -212,7 +221,7 @@ exports.updateItem = (req, res) => {
           ItemUnit = ?, 
           ItemTax = ?, 
           IteamDiscount = ?, 
-          IteamPrice = ?
+          IteamPrice = ? ,Iteamstock=?
         WHERE ItemCode = ?
       `;
       const updateValues = [
@@ -222,7 +231,7 @@ exports.updateItem = (req, res) => {
         ItemTax,
         IteamDiscount,
         IteamPrice,
-        ItemCode,
+        ItemCode,Iteamstock,
       ];
 
       db.query(updateSql, updateValues, (err, result) => {
