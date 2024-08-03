@@ -35,10 +35,10 @@ const createTables = () => {
     ItemDescription VARCHAR(255) NOT NULL,
      ItemSupplier JSON, 
     ItemUnit VARCHAR(255) NOT NULL,
-    ItemTax VARCHAR(255) NOT NULL,
-    IteamDiscount VARCHAR(255) NOT NULL,
-    IteamPrice VARCHAR(255) NOT NULL,
-    Iteamstock VARCHAR(255) NOT NULL
+    ItemTax DECIMAL(10, 2) NOT NULL,
+    IteamDiscount DECIMAL(10, 2) NOT NULL,
+    IteamPrice DECIMAL(10, 2) NOT NULL,
+    Iteamstock DECIMAL(10, 2) NOT NULL
   );
 `;
 

@@ -177,10 +177,11 @@ exports.updateItem = (req, res) => {
     ItemUnit,
     ItemTax,
     IteamDiscount,
-    IteamPrice,Iteamstock,
+    IteamPrice,
+    Iteamstock,
   } = req.body;
 
-  // Validate required fields for inserting
+  // Validate required fields for updating
   if (
     !ItemCode ||
     !ItemDescription ||
@@ -194,8 +195,6 @@ exports.updateItem = (req, res) => {
       .status(400)
       .json({ error: "All required fields must be provided" });
   }
-
-
 
   // Check if ItemCode exists
   const checkSql = `SELECT * FROM iteamTabele WHERE ItemCode = ?`;
@@ -212,7 +211,6 @@ exports.updateItem = (req, res) => {
       const existingItem = rows[0];
       const existingSuppliers = JSON.parse(existingItem.ItemSupplier || "[]"); // Parse existing suppliers
 
-    
       const updateSql = `
         UPDATE iteamTabele
         SET 
@@ -221,7 +219,8 @@ exports.updateItem = (req, res) => {
           ItemUnit = ?, 
           ItemTax = ?, 
           IteamDiscount = ?, 
-          IteamPrice = ? ,Iteamstock=?
+          IteamPrice = ?, 
+          Iteamstock = ?
         WHERE ItemCode = ?
       `;
       const updateValues = [
@@ -231,7 +230,8 @@ exports.updateItem = (req, res) => {
         ItemTax,
         IteamDiscount,
         IteamPrice,
-        ItemCode,Iteamstock,
+        Iteamstock, // Place Iteamstock before ItemCode
+        ItemCode
       ];
 
       db.query(updateSql, updateValues, (err, result) => {
@@ -250,6 +250,7 @@ exports.updateItem = (req, res) => {
     }
   });
 };
+
 
 
 
