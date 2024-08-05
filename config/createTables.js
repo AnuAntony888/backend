@@ -38,7 +38,10 @@ const createTables = () => {
     ItemTax DECIMAL(10, 2) NOT NULL,
     IteamDiscount DECIMAL(10, 2) NOT NULL,
     IteamPrice DECIMAL(10, 2) NOT NULL,
-    Iteamstock DECIMAL(10, 2) NOT NULL
+    Iteamstock DECIMAL(10, 2) NOT NULL,
+    user_id VARCHAR(255),
+     FOREIGN KEY (user_id) REFERENCES suppliers(user_id)
+    
   );
 `;
 
