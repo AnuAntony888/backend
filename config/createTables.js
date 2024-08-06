@@ -24,57 +24,60 @@ const createTables = () => {
   const createSuppliersTable = `
     CREATE TABLE IF NOT EXISTS suppliers (
       user_id VARCHAR(255) PRIMARY KEY,
+      SupplierCode INT AUTO_INCREMENT UNIQUE,
       SupplierDescription VARCHAR(255) NOT NULL,
-      SupplierAddress VARCHAR(255) NOT NULL
-    );
+      SupplierAddress VARCHAR(255) NOT NULL 
+        );
+    
   `;
+
   const createIteamTable = `
   CREATE TABLE IF NOT EXISTS iteamTabele (
-    product_id VARCHAR(255) PRIMARY KEY,
+  Item_id VARCHAR(255) PRIMARY KEY,
     ItemCode VARCHAR(255) NOT NULL,
-    ItemDescription VARCHAR(255) NOT NULL,
-     ItemSupplier JSON, 
+    ItemDescription VARCHAR(255) NOT NULL,    
+     ItemSupplier VARCHAR(255) NOT NULL, 
     ItemUnit VARCHAR(255) NOT NULL,
     ItemTax DECIMAL(10, 2) NOT NULL,
     IteamDiscount DECIMAL(10, 2) NOT NULL,
     IteamPrice DECIMAL(10, 2) NOT NULL,
-    Iteamstock DECIMAL(10, 2) NOT NULL,
-    user_id VARCHAR(255),
-     FOREIGN KEY (user_id) REFERENCES suppliers(user_id)
+    Iteamstock DECIMAL(10, 2) NOT NULL,    
+    FOREIGN KEY (ItemSupplier) REFERENCES suppliers(user_id)
     
   );
 `;
+// user_id VARCHAR(255),
 
-  db.query(createProductsTable, (err, result) => {
-    if (err) {
-      console.error("Error creating products table:", err);
-      return;
-    }
-    console.log("Products table created or already exists.");
+const createCustomerTable = `
+CREATE TABLE IF NOT EXISTS customerTabele (
+  customer_id VARCHAR(255) PRIMARY KEY,
+  customerName VARCHAR(255) NOT NULL,
+customerContactNo VARCHAR(255) NOT NULL,
+ customerTownCity VARCHAR(255) NOT NULL,
+  customerPin VARCHAR(255) NOT NULL,
+ customerGSTN VARCHAR(255) NOT NULL,
+customerAddress VARCHAR(255) NOT NULL  
+);
+`;
 
-    db.query(createSuppliersTable, (err, result) => {
+
+   // Function to run the queries
+   const runQuery = (query, successMessage, errorMessage, callback) => {
+    db.query(query, (err, result) => {
       if (err) {
-        console.error("Error creating suppliers table:", err);
-        return;
+        console.error(errorMessage, err);
+      } else {
+        console.log(successMessage);
+        if (callback) callback();
       }
-      console.log("Suppliers table created or already exists.");
-
-      db.query(createUsersTable, (err, result) => {
-        if (err) {
-          console.error("Error creating users table:", err);
-          return;
-        }
-        console.log("Users table created or already exists.");
-        db.query(createIteamTable, (err, result) => {
-          if (err) {
-            console.error("Error creating users table:", err);
-            return;
-          }
-          console.log("Users table created or already exists.");
-        })
-        
-      });
     });
+  };
+
+  // Create tables and set AUTO_INCREMENT value
+  runQuery(createProductsTable, "Products table created or already exists.", "Error creating products table.");
+  runQuery(createSuppliersTable, "Suppliers table created or already exists.", "Error creating suppliers table.", () => {    runQuery(createUsersTable, "Users table created or already exists.", "Error creating users table.");
+  runQuery(createIteamTable, "Iteam table created or already exists.", "Error creating iteam table.");
+  runQuery(createCustomerTable, "Customer table created or already exists.", "Error creating Customer table.");
   });
 };
 
