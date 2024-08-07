@@ -8,4 +8,5 @@ router.post('/getsuplier', suppilerController.getSupplierById); // Endpoint to g
 router.put('/updatesuplier', suppilerController.updateSupplier); // Endpoint to update supplier details by user_id
 router.delete('/deletesuplier', suppilerController.deleteSupplier); // Endpoint to delete supplier details by user_id
 router.get('/getAllsuplier', suppilerController.getAllSupplier);
+router.post('/check-supplier', suppilerController.checkSupplier);
 module.exports = router;

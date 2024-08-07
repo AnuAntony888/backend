@@ -190,3 +190,29 @@ exports.getAllSupplier = (req, res) => {
     res.status(200).json(results);
   });
 };
+
+
+// Check supplier exist
+exports.checkSupplier = (req, res) => {
+  const { SupplierDescription} = req.body;
+
+  if (!SupplierDescription) {
+    return res.status(400).json({ error: 'Supplier description is required' });
+  }
+
+  const query = 'SELECT * FROM suppliers WHERE SupplierDescription = ?';
+  db.query(query, [SupplierDescription], (err, results) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      return res.status(500).json({ error: 'Database query failed', details: err.message });
+    }
+
+    if (results.length > 0) {
+      res.status(200).json({ exists: true });
+    } else {
+      res.status(200).json({ exists: false });
+    }
+  });
+};
+
+
