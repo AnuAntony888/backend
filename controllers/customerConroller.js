@@ -64,7 +64,10 @@ exports.createCustomer = async (req, res) => {
               .json({ error: "Database update failed", details: err.message });
           }
 
-          res.status(200).json({ message: "Customer Details updated successfully" });
+          res.status(200).json({
+            message: "Customer Details updated successfully",
+            customer_id: rows[0].customer_id
+           });
         });
       } else {
         const insertSql = `
@@ -97,7 +100,11 @@ exports.createCustomer = async (req, res) => {
               .json({ error: "Database insert failed", details: err.message });
           }
 
-          res.status(201).json({ message: "New Customer created successfully" });
+          res.status(201).json({
+            message: "New Customer created successfully",
+            
+            customer_id: insertValues[0]
+           });
         });
       }
     });

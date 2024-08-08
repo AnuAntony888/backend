@@ -7,7 +7,8 @@ const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const supplierRoutes = require('./routes/supplierRoutes');
 const itemRoutes = require('./routes/itemRoutes');
-const customerRoutes =require('./routes/customerRoutes')
+const customerRoutes = require('./routes/customerRoutes')
+const invoiceRouters = require('./routes/invoiceRoutes');
 const corsOptions = require("./config/cors");
 require("./config/createTables"); // Import and execute the table creation script
 const app = express();
@@ -23,7 +24,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/supplier", supplierRoutes); 
 app.use("/api/item", itemRoutes); 
-app.use("/api/customer",customerRoutes); 
+app.use("/api/customer", customerRoutes); 
+app.use("/api/invoice",invoiceRouters)
 // Route for root URL
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
