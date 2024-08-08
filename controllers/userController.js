@@ -129,7 +129,13 @@ exports.login = (req, res) => {
 
           console.log("Generated token:", token); // Debugging log
 
-          res.json({ message: "Login successful", token });
+          res.json({
+            message: "Login successful",
+            token:token,
+            userId: user.user_id,    // Added userId
+            email: user.email,  // Added email
+            name: user.name     // Added name (ensure `name` exists in the database)
+          });
         } else {
           res.status(401).json({ error: "Invalid credentials" });
         }

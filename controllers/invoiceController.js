@@ -10,6 +10,7 @@ exports.createinvoice = async (req, res) => {
       invoice_no,
       customer_id,
       product_id,
+      paymentmethod,
       product_actual_total,
       product_discounted_total,
       cartCount,
@@ -25,7 +26,8 @@ exports.createinvoice = async (req, res) => {
       !product_actual_total ||
       !product_discounted_total ||
       !cartCount ||
-      !orderstatus
+      !orderstatus ||
+      !paymentmethod
     ) {
       return res
         .status(400)
@@ -45,9 +47,10 @@ if (productIdsArray.length !== cartCountsArray.length) {
         product_actual_total,
         product_discounted_total,
         cartCount,
-        orderstatus
+        orderstatus,
+        paymentmethod
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
     `;
     for (let i = 0; i < productIdsArray.length; i++) {
     const insertValues = [
@@ -59,6 +62,7 @@ if (productIdsArray.length !== cartCountsArray.length) {
       product_discounted_total,
       cartCountsArray[i],
       orderstatus,
+      paymentmethod
     ];
 
     await new Promise((resolve, reject) => {
