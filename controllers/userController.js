@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET =
   process.env.JWT_SECRET ||
   "e08e19dd47b1ccb6fc50f1edbe10d4a8f5ad19f71fced245553341f2dd432f7e";
-const JWT_EXPIRATION = process.env.JWT_EXPIRATION || "1h";
+const JWT_EXPIRATION = process.env.JWT_EXPIRATION || "360d";
 
 let tokenBlacklist = []; // In-memory blacklist, use a persistent store in production
 

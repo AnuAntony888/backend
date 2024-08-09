@@ -154,14 +154,15 @@ exports.deleteSupplier = (req, res) => {
   // Log the request body to ensure it's being received
   console.log("Request Body:", req.body);
 
-  // Extract the user_id from the JSON body
-  const { SupplierCode} = req.body;
+  // Extract the SupplierCode from the JSON body
+  const { SupplierCode } = req.body;
   console.log("SupplierCode received:", SupplierCode);
 
   if (!SupplierCode) {
     return res.status(400).json({ error: "SupplierCode is required" });
   }
 
+  // SQL query to delete the supplier based on SupplierCode
   const sql = "DELETE FROM suppliers WHERE SupplierCode = ?";
 
   db.query(sql, [SupplierCode], (err, result) => {
@@ -177,6 +178,7 @@ exports.deleteSupplier = (req, res) => {
     res.status(200).json({ message: "Supplier deleted successfully" });
   });
 };
+
 
 // Get all Supplier
 exports.getAllSupplier = (req, res) => {

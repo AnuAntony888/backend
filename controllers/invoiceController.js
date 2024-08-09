@@ -10,6 +10,15 @@ exports.createinvoice = async (req, res) => {
       invoice_no,
       customer_id,
       product_id,
+      ItemCode ,
+      ItemDescription , 
+     
+      ItemUnit ,
+      ItemTax ,
+      IteamDiscount ,
+      IteamPrice ,
+      Iteamstock ,  
+
       paymentmethod,
       product_actual_total,
       product_discounted_total,
@@ -18,6 +27,14 @@ exports.createinvoice = async (req, res) => {
     } = req.body;
     const productIdsArray = JSON.parse(product_id);
     const cartCountsArray = JSON.parse(cartCount);
+    const  ItemCodeArray =JSON.parse(ItemCode)
+    const  ItemDescriptionArray =JSON.parse(ItemDescription)
+   
+    ItemUnit ,
+    ItemTax ,
+    IteamDiscount ,
+    IteamPrice ,
+    Iteamstock ,  
     // Validate required fields
     if (
       !invoice_no ||
@@ -44,6 +61,14 @@ if (productIdsArray.length !== cartCountsArray.length) {
         invoice_no,
         customer_id,
         product_id,
+         ItemCode 
+    ItemDescription , 
+   
+    ItemUnit ,
+    ItemTax ,
+    IteamDiscount ,
+    IteamPrice ,
+    Iteamstock ,   
         product_actual_total,
         product_discounted_total,
         cartCount,

@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const IteamController = require("../controllers/IteamController");
+const authenticateToken = require('../middleware/authenticateToken');
 
-
-router.post('/createiteam', IteamController.createIteame);
- router.post('/getitembyitemcode', IteamController.getItemByItemcode); // Endpoint to get supplier details by user_id
-router.put('/updateitem', IteamController.updateItem);
+router.post('/createiteam',authenticateToken, IteamController.createIteame);
+ router.post('/getitembyitemcode',authenticateToken, IteamController.getItemByItemcode); // Endpoint to get supplier details by user_id
+router.put('/updateitem',authenticateToken, IteamController.updateItem);
 router.delete('/deleteitem', IteamController.deleteItem);
 module.exports = router;

@@ -115,3 +115,34 @@ exports.createCustomer = async (req, res) => {
       .json({ error: "Failed to process item", details: err.message });
   }
 };
+
+
+//get customer
+
+exports.getCustomerById = (req, res) => {
+
+  console.log("Request Body:", req.body);
+
+  const { customerContactNo} = req.body;
+  console.log("customerContactNo received:", customerContactNo);
+  if (!customerContactNo) {
+    return res.status(400).json({ error: "customerContactNo is required" });
+  }
+  const sql = "SELECT * FROM customerTabele WHERE customerContactNo = ?";
+  db.query(sql, [customerContactNo], (err, results) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to retrieve supplier details" });
+    }
+    console.log("Query Results:", results);
+    if (results.length === 0) {
+      return res.status(404).json({ error: "customerContactNo not found" });
+    }
+    const customerTabele = results[0];
+    // res.status(200).json(supplier);
+    res.status(200).json({
+      message: "customerContactNo details retrieved successfully",
+      customerTabele: customerTabele
+    });
+  });
+};
