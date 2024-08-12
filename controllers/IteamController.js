@@ -220,9 +220,7 @@ exports.updateItem = (req, res) => {
     }
 
     if (rows.length > 0) {
-      // // If ItemCode exists, update the existing record
-      // const existingItem = rows[0];
-      // const existingSuppliers = JSON.parse(existingItem.ItemSupplier || "[]"); // Parse existing suppliers
+    
 
       const updateSql = `
         UPDATE iteamTabele
