@@ -16,11 +16,16 @@ const createTables = () => {
     CREATE TABLE IF NOT EXISTS users (
       user_id VARCHAR(255) PRIMARY KEY,
       name VARCHAR(255) NOT NULL UNIQUE,
+      employeeno VARCHAR(255) NOT NULL,
+      employeecategory VARCHAR(255) NOT NULL,
+      employeestatus VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL UNIQUE,
       password VARCHAR(255) NOT NULL
     );
   `;
-
+  const addusersTabeleColumn = `
+  ALTER TABLE users ADD visibility TINYINT DEFAULT 1;
+  `;
   const createSuppliersTable = `
     CREATE TABLE IF NOT EXISTS suppliers (
       user_id VARCHAR(255) PRIMARY KEY,
@@ -30,6 +35,12 @@ const createTables = () => {
         );
     
   `;
+  const addVisibilityColumn = `
+  ALTER TABLE suppliers ADD visibility TINYINT DEFAULT 1;
+`;
+const additeamTabeleColumn = `
+ALTER TABLE iteamTabele ADD visibility TINYINT DEFAULT 1;
+`;
 
   const createIteamTable = `
   CREATE TABLE IF NOT EXISTS iteamTabele (
@@ -60,31 +71,7 @@ customerAddress VARCHAR(255) NOT NULL
 );
 `;
 
-// const createInvoiceTable = `
-// CREATE TABLE IF NOT EXISTS Invoice (
-//   invoice_id VARCHAR(255) PRIMARY KEY,
-//   invoice_no VARCHAR(255) NOT NULL,
-//   customer_id VARCHAR(255) NOT NULL,
-//   product_id VARCHAR(255) NOT NULL,
-//  ItemCode VARCHAR(255) NOT NULL,
-//     ItemDescription VARCHAR(255) NOT NULL,
- //     ItemUnit VARCHAR(255) NOT NULL,
-//     ItemTax DECIMAL(10, 2) NOT NULL,
-//     IteamDiscount DECIMAL(10, 2) NOT NULL,
-//     IteamPrice DECIMAL(10, 2) NOT NULL,
-//     Iteamstock DECIMAL(10, 2) NOT NULL,
-//   product_actual_total DECIMAL(10, 2),
-//   product_discounted_total DECIMAL(10, 2),
-//   cartCount INT NOT NULL,
-//   paymentmethod VARCHAR(255) NOT NULL,
-//   orderstatus VARCHAR(255) NOT NULL,
-//   empolyee_id VARCHAR(255) NOT NULL,
-//   FOREIGN KEY (customer_id) REFERENCES customerTabele(customer_id),
-//   FOREIGN KEY (product_id) REFERENCES iteamTabele(product_id),
-//   FOREIGN KEY (empolyee_id) REFERENCES users(user_id)
-// );
 
-  // `;
 const createInvoiceTable = `
   CREATE TABLE IF NOT EXISTS Invoice (
     invoice_id VARCHAR(255) PRIMARY KEY,
@@ -101,6 +88,7 @@ const createInvoiceTable = `
     ItemStock DECIMAL(10, 2) NOT NULL,
     product_actual_total DECIMAL(10, 2),
     product_discounted_total DECIMAL(10, 2),
+    product_total DECIMAL(10, 2),
     cartCount INT NOT NULL,
     paymentmethod VARCHAR(255) NOT NULL,
     orderstatus VARCHAR(255) NOT NULL,
@@ -127,8 +115,11 @@ const createInvoiceTable = `
   runQuery(createProductsTable, "Products table created or already exists.", "Error creating products table.");
   runQuery(createSuppliersTable, "Suppliers table created or already exists.", "Error creating suppliers table.", () => {    runQuery(createUsersTable, "Users table created or already exists.", "Error creating users table.");
   runQuery(createIteamTable, "Iteam table created or already exists.", "Error creating iteam table.");
-    runQuery(createCustomerTable, "Customer table created or already exists.", "Error creating Customer table.");
-    runQuery(createInvoiceTable, "invoice table created or already exists.", "Error creating invoice table.");
+  runQuery(createCustomerTable, "Customer table created or already exists.", "Error creating Customer table.");
+  runQuery(createInvoiceTable, "invoice table created or already exists.", "Error creating invoice table.");
+  runQuery(addVisibilityColumn, "alter suppliertabel");
+    runQuery(additeamTabeleColumn, "alter suppliertabel");
+    runQuery(addusersTabeleColumn, "uservisiblity");
   });
 };
 

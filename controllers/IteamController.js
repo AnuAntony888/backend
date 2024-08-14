@@ -4,73 +4,57 @@ const db = require("../utils/db"); // Ensure you have a proper db connection set
 
 exports.createIteame = async (req, res) => {
   try {
-    // Extract the data from the request body
     const {
       ItemCode,
       ItemDescription,
-      ItemSupplier, // Supplier keyword from the frontend
+      ItemSupplier,
       ItemUnit,
       ItemTax,
       IteamDiscount,
       IteamPrice,
       Iteamstock,
+      visibility = 1 // Default visibility to 1
     } = req.body;
 
-    // Log the received request body for debugging
     console.log("Received request body:", req.body);
 
-    // Validate required fields for inserting
     if (
       !ItemCode ||
       !ItemDescription ||
-      !ItemSupplier || // Ensure ItemSupplier is provided
+      !ItemSupplier ||
       !ItemUnit ||
       !ItemTax ||
       !IteamDiscount ||
       !IteamPrice ||
       !Iteamstock
     ) {
-      return res
-        .status(400)
-        .json({ error: "All required fields must be provided" });
+      return res.status(400).json({ error: "All required fields must be provided" });
     }
 
-    // Fetch SupplierID using ItemSupplier as SupplierDescription
     const getSupplierSql = `SELECT user_id FROM suppliers WHERE SupplierDescription = ?`;
     db.query(getSupplierSql, [ItemSupplier], (err, supplierRows) => {
       if (err) {
         console.error("Error:", err);
-        return res
-          .status(500)
-          .json({ error: "Database query failed", details: err.message });
+        return res.status(500).json({ error: "Database query failed", details: err.message });
       }
 
       if (supplierRows.length === 0) {
         return res.status(400).json({ error: "Supplier not found" });
       }
 
-      const supplierID = supplierRows[0].user_id; // Get the supplier ID
+      const supplierID = supplierRows[0].user_id;
 
-      // Check if the item with the same ItemCode and ItemSupplier already exists
       const checkSql = `SELECT * FROM iteamTabele WHERE ItemCode = ? AND ItemSupplier = ?`;
       db.query(checkSql, [ItemCode, supplierID], (err, existingItems) => {
         if (err) {
           console.error("Error:", err);
-          return res
-            .status(500)
-            .json({ error: "Database query failed", details: err.message });
+          return res.status(500).json({ error: "Database query failed", details: err.message });
         }
 
         if (existingItems.length > 0) {
-          // Item with the same ItemCode and ItemSupplier already exists
-          return res
-            .status(500)
-            .json({
-              error: "Item with the same ItemCode and Supplier already exists",
-            });
+          return res.status(500).json({ error: "Item with the same ItemCode and Supplier already exists" });
         }
 
-        // Insert a new record
         const insertSql = `
           INSERT INTO iteamTabele (
             product_id,
@@ -81,12 +65,13 @@ exports.createIteame = async (req, res) => {
             ItemTax,
             IteamDiscount,
             IteamPrice,
-            Iteamstock
+            Iteamstock,
+            visibility
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const insertValues = [
-          uuidv4(), // Generate a new UUID for Item_id
+          uuidv4(),
           ItemCode,
           ItemDescription,
           supplierID,
@@ -95,14 +80,13 @@ exports.createIteame = async (req, res) => {
           IteamDiscount,
           IteamPrice,
           Iteamstock,
+          visibility // Include visibility in insert
         ];
 
         db.query(insertSql, insertValues, (err, result) => {
           if (err) {
             console.error("Error:", err);
-            return res
-              .status(500)
-              .json({ error: "Database insert failed", details: err.message });
+            return res.status(500).json({ error: "Database insert failed", details: err.message });
           }
 
           res.status(201).json({ message: "Item created successfully" });
@@ -111,16 +95,13 @@ exports.createIteame = async (req, res) => {
     });
   } catch (err) {
     console.error("Error:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to process item", details: err.message });
+    res.status(500).json({ error: "Failed to process item", details: err.message });
   }
 };
 
 {
   /*****************************************************************8 */
 }
-
 
 exports.getItemByItemcode = (req, res) => {
   // Log the request body to ensure it's being received
@@ -135,7 +116,7 @@ exports.getItemByItemcode = (req, res) => {
   }
 
   // Query to get item details
-  const getItemSql = "SELECT * FROM iteamtabele WHERE ItemCode = ?";
+  const getItemSql = "SELECT * FROM iteamtabele WHERE ItemCode = ? AND visibility = 1";
   db.query(getItemSql, [ItemCode], (err, itemResults) => {
     if (err) {
       console.error("Database Error:", err);
@@ -192,6 +173,7 @@ exports.updateItem = (req, res) => {
     IteamDiscount,
     IteamPrice,
     Iteamstock,
+    visibility 
   } = req.body;
 
   // Validate required fields for updating
@@ -220,8 +202,6 @@ exports.updateItem = (req, res) => {
     }
 
     if (rows.length > 0) {
-    
-
       const updateSql = `
         UPDATE iteamTabele
         SET 
@@ -230,7 +210,8 @@ exports.updateItem = (req, res) => {
           ItemTax = ?, 
           IteamDiscount = ?, 
           IteamPrice = ?, 
-          Iteamstock = ?
+          Iteamstock = ?,
+          visibility = ? 
         WHERE ItemCode = ?
       `;
       const updateValues = [
@@ -241,6 +222,7 @@ exports.updateItem = (req, res) => {
         IteamDiscount,
         IteamPrice,
         Iteamstock, // Place Iteamstock before ItemCode
+        visibility !== undefined ? visibility : 1,
         ItemCode,
       ];
 
@@ -264,29 +246,27 @@ exports.updateItem = (req, res) => {
   /**********************delete supplier using userid*************************************88 */
 }
 exports.deleteItem = (req, res) => {
-  // Log the request body to ensure it's being received
   console.log("Request Body:", req.body);
 
-  // Extract the user_id from the JSON body
   const { ItemCode } = req.body;
-  console.log("Item received:", ItemCode);
+  console.log("ItemCode received:", ItemCode);
 
   if (!ItemCode) {
-    return res.status(400).json({ error: "Item is required" });
+    return res.status(400).json({ error: "ItemCode is required" });
   }
 
-  const sql = "DELETE FROM iteamTabele WHERE ItemCode = ?";
-
-  db.query(sql, [ItemCode], (err, result) => {
+  // Instead of deleting, update visibility to 0
+  const updateSql = "UPDATE iteamTabele SET visibility = 0 WHERE ItemCode = ?";
+  db.query(updateSql, [ItemCode], (err, result) => {
     if (err) {
       console.error("Database Error:", err);
-      return res.status(500).json({ error: "Failed to delete Item" });
+      return res.status(500).json({ error: "Failed to update Item visibility" });
     }
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Item not found" });
     }
 
-    res.status(200).json({ message: "Item deleted successfully" });
+    res.status(200).json({ message: "Item visibility updated to hidden" });
   });
 };
