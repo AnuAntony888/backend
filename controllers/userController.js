@@ -96,7 +96,7 @@ exports.signup = async (req, res) => {
     employeeno,
     employeecategory,
     employeestatus,
-    visibility = 1 // Default visibility to 1
+    visibility = 1, // Default visibility to 1
   } = req.body;
 
   // Validate required fields
@@ -153,14 +153,16 @@ exports.signup = async (req, res) => {
               employeecategory,
               employeestatus,
               visibility,
-              email
+              email,
             ],
             (err, results) => {
               if (err) {
                 console.error("Error updating user:", err);
                 return res
                   .status(500)
-                  .json({ error: "An error occurred while updating the user." });
+                  .json({
+                    error: "An error occurred while updating the user.",
+                  });
               }
 
               res.json({ message: "User details updated successfully" });
@@ -187,7 +189,7 @@ exports.signup = async (req, res) => {
               employeeno,
               employeecategory,
               employeestatus,
-              visibility
+              visibility,
             ],
             (err, results) => {
               if (err) {
@@ -204,7 +206,7 @@ exports.signup = async (req, res) => {
                 employeeno,
                 employeecategory,
                 employeestatus,
-                visibility
+                visibility,
               });
             }
           );
@@ -251,7 +253,7 @@ exports.login = (req, res) => {
   }
 
   db.query(
-    "SELECT * FROM users WHERE email = ?",
+    "SELECT * FROM users WHERE email = ? AND visibility = 1",
     [email],
     async (err, results) => {
       if (err) {
@@ -283,6 +285,7 @@ exports.login = (req, res) => {
             userId: user.user_id, // Added userId
             email: user.email, // Added email
             name: user.name, // Added name (ensure `name` exists in the database)
+            employeestatus: user.employeestatus,
           });
         } else {
           res.status(401).json({ error: "Invalid credentials" });
@@ -307,58 +310,30 @@ exports.logout = (req, res) => {
 
 /***************************update query****************************************/
 exports.updateUser = async (req, res) => {
-  const {
-    email,
-    name,
-    password,
-    employeeno,
-    employeecategory,
-    employeestatus,
-
-  } = req.body;
+  const { email, name, employeeno, employeecategory } = req.body;
 
   // Validate required fields
-  if (!email || !name || !password) {
-    return res
-      .status(400)
-      .json({ error: "Email, name, and password are required" });
-  }
-
-  if (password.length < 8) {
-    return res
-      .status(400)
-      .json({ error: "Password must be at least 8 characters long" });
+  if (!email || !name) {
+    return res.status(400).json({ error: "Email & name are required" });
   }
 
   try {
-    // Hash the password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     // Update user details
     const updateSql = `
       UPDATE users
       SET
         name = ?,
-        password = ?,
+
         employeeno = ?,
         employeecategory = ?,
-        employeestatus = ?,
+       
        visibility = 1
       WHERE email = ?
     `;
 
     db.query(
       updateSql,
-      [
-        name,
-        hashedPassword,
-        employeeno,
-        employeecategory,
-        employeestatus,
-       
-        email
-      ],
+      [name, employeeno, employeecategory, email],
       (err, result) => {
         if (err) {
           console.error("Error updating user:", err);
@@ -376,39 +351,86 @@ exports.updateUser = async (req, res) => {
     );
   } catch (error) {
     console.error("Error hashing password:", error);
-    res.status(500).json({ error: "An error occurred while hashing the password." });
+    res
+      .status(500)
+      .json({ error: "An error occurred while hashing the password." });
   }
 };
 /***************************getuserbyid****************************************/
 exports.getUserByEmail = (req, res) => {
   const { email } = req.body;
-
   // Validate email
   if (!email) {
     return res.status(400).json({ error: "Email is required" });
   }
-
   const query = `
     SELECT user_id, name, email, employeeno, employeecategory, employeestatus, visibility 
-    FROM users 
-    WHERE email = ? AND visibility = 1
+    FROM users WHERE email = ? AND visibility = 1
   `;
-
   db.query(query, [email], (err, results) => {
     if (err) {
       console.error("Error fetching user details:", err);
-      return res.status(500).json({ error: "An error occurred while fetching user details." });
+      return res
+        .status(500)
+        .json({ error: "An error occurred while fetching user details." });
     }
-
     if (results.length === 0) {
       return res.status(404).json({ error: "User not found or not visible" });
     }
-
     // Return user details
     res.status(200).json(results[0]);
   });
 };
 
+/*******************************userDelete******************************************** */
+
+exports.deleteuser = (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: "email is required" });
+  }
+
+  const sql = "UPDATE users SET visibility = 0 WHERE email = ?";
+  db.query(sql, [email], (err, result) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res
+        .status(500)
+        .json({ error: "Failed to update supplier visibility" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Supplier not found" });
+    }
+
+    res.status(200).json({ message: "Supplier delete successfully" });
+  });
+};
+
+/**********************token************************************** */
 exports.isTokenBlacklisted = (token) => {
   return tokenBlacklist.includes(token);
+};
+/***************************get all employee details****************************************/
+
+exports.getAllVisibleEmployees = (req, res) => {
+  const query = `
+    SELECT employeeno, name, email
+    FROM users
+    WHERE visibility = 1 AND employeestatus = 'employee'
+  `;
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching employee details:", err);
+      return res
+        .status(500)
+        .json({ error: "An error occurred while fetching employee details." });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: "No visible employees found with status 'employee'" });
+    }
+    // Return employee details
+    res.status(200).json(results);
+  });
 };

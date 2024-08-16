@@ -38,7 +38,7 @@ const createTables = () => {
   const addVisibilityColumn = `
   ALTER TABLE suppliers ADD visibility TINYINT DEFAULT 1;
 `;
-const additeamTabeleColumn = `
+  const additeamTabeleColumn = `
 ALTER TABLE iteamTabele ADD visibility TINYINT DEFAULT 1;
 `;
 
@@ -57,9 +57,9 @@ ALTER TABLE iteamTabele ADD visibility TINYINT DEFAULT 1;
    
   );
 `;
-// user_id VARCHAR(255),
+  // user_id VARCHAR(255),
 
-const createCustomerTable = `
+  const createCustomerTable = `
 CREATE TABLE IF NOT EXISTS customerTabele (
   customer_id VARCHAR(255) PRIMARY KEY,
   customerName VARCHAR(255) NOT NULL,
@@ -71,21 +71,13 @@ customerAddress VARCHAR(255) NOT NULL
 );
 `;
 
-
-const createInvoiceTable = `
+  const createInvoiceTable = `
   CREATE TABLE IF NOT EXISTS Invoice (
     invoice_id VARCHAR(255) PRIMARY KEY,
     invoice_no VARCHAR(255) NOT NULL,
      invoice_date VARCHAR(255) NOT NULL,
     customer_id VARCHAR(255) NOT NULL,
     product_id VARCHAR(255) NOT NULL,
-    ItemCode VARCHAR(255) NOT NULL,
-    ItemDescription VARCHAR(255) NOT NULL, 
-    ItemUnit VARCHAR(255) NOT NULL,
-    ItemTax DECIMAL(10, 2) NOT NULL,
-    ItemDiscount DECIMAL(10, 2) NOT NULL,
-    ItemPrice DECIMAL(10, 2) NOT NULL,
-    ItemStock DECIMAL(10, 2) NOT NULL,
     product_actual_total DECIMAL(10, 2),
     product_discounted_total DECIMAL(10, 2),
     product_total DECIMAL(10, 2),
@@ -99,8 +91,28 @@ const createInvoiceTable = `
   );
   `;
 
-   // Function to run the queries
-   const runQuery = (query, successMessage, errorMessage, callback) => {
+  const createMasterTable = `
+  CREATE TABLE IF NOT EXISTS masterTabele (
+   master_id VARCHAR(255) PRIMARY KEY,
+    entityName VARCHAR(255) NOT NULL,
+      entityAddress VARCHAR(255) NOT NULL  ,
+  tax VARCHAR(255) NOT NULL,
+   discount VARCHAR(255) NOT NULL,
+    itemTax VARCHAR(255) NOT NULL,
+    itemDiscount VARCHAR(255) NOT NULL,
+  visibility TINYINT DEFAULT 1
+  );
+  `;
+  // ItemCode VARCHAR(255) NOT NULL,
+  // ItemDescription VARCHAR(255) NOT NULL,
+  // ItemUnit VARCHAR(255) NOT NULL,
+  // ItemTax DECIMAL(10, 2) NOT NULL,
+  // ItemDiscount DECIMAL(10, 2) NOT NULL,
+  // ItemPrice DECIMAL(10, 2) NOT NULL,
+  // ItemStock DECIMAL(10, 2) NOT NULL,
+
+  // Function to run the queries
+  const runQuery = (query, successMessage, errorMessage, callback) => {
     db.query(query, (err, result) => {
       if (err) {
         console.error(errorMessage, err);
@@ -112,15 +124,42 @@ const createInvoiceTable = `
   };
 
   // Create tables and set AUTO_INCREMENT value
-  runQuery(createProductsTable, "Products table created or already exists.", "Error creating products table.");
-  runQuery(createSuppliersTable, "Suppliers table created or already exists.", "Error creating suppliers table.", () => {    runQuery(createUsersTable, "Users table created or already exists.", "Error creating users table.");
-  runQuery(createIteamTable, "Iteam table created or already exists.", "Error creating iteam table.");
-  runQuery(createCustomerTable, "Customer table created or already exists.", "Error creating Customer table.");
-  runQuery(createInvoiceTable, "invoice table created or already exists.", "Error creating invoice table.");
-  runQuery(addVisibilityColumn, "alter suppliertabel");
-    runQuery(additeamTabeleColumn, "alter suppliertabel");
-    runQuery(addusersTabeleColumn, "uservisiblity");
-  });
+  runQuery(
+    createProductsTable,
+    "Products table created or already exists.",
+    "Error creating products table."
+  );
+  runQuery(
+    createSuppliersTable,
+    "Suppliers table created or already exists.",
+    "Error creating suppliers table.",
+    () => {
+      runQuery(
+        createUsersTable,
+        "Users table created or already exists.",
+        "Error creating users table."
+      );
+      runQuery(
+        createIteamTable,
+        "Iteam table created or already exists.",
+        "Error creating iteam table."
+      );
+      runQuery(
+        createCustomerTable,
+        "Customer table created or already exists.",
+        "Error creating Customer table."
+      );
+      runQuery(
+        createInvoiceTable,
+        "invoice table created or already exists.",
+        "Error creating invoice table."
+      );
+      runQuery(createMasterTable,"create MasterTable")
+      runQuery(addVisibilityColumn, "alter suppliertabel");
+      runQuery(additeamTabeleColumn, "alter suppliertabel");
+      runQuery(addusersTabeleColumn, "uservisiblity");
+    }
+  );
 };
 
 module.exports = createTables;

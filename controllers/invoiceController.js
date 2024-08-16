@@ -10,13 +10,7 @@ exports.createinvoice = async (req, res) => {
       invoice_date,
       customer_id,
       product_id,
-      ItemCode,
-      ItemDescription,
-      ItemUnit,
-      ItemTax,
-      ItemDiscount,
-      ItemPrice,
-      Itemstock,
+      
       paymentmethod,
       product_actual_total,
       product_discounted_total,
@@ -48,24 +42,12 @@ exports.createinvoice = async (req, res) => {
     // Parse JSON fields
     const productIdsArray = JSON.parse(product_id);
     const cartCountsArray = JSON.parse(cartCount);
-    const itemCodesArray = JSON.parse(ItemCode);
-    const itemDescriptionsArray = JSON.parse(ItemDescription);
-    const itemUnitsArray = JSON.parse(ItemUnit);
-    const itemTaxesArray = JSON.parse(ItemTax);
-    const itemDiscountsArray = JSON.parse(ItemDiscount);
-    const itemPricesArray = JSON.parse(ItemPrice);
-    const itemStocksArray = JSON.parse(Itemstock);
+
 
     // Validate lengths of arrays
     if (
-      productIdsArray.length !== cartCountsArray.length ||
-      productIdsArray.length !== itemCodesArray.length ||
-      productIdsArray.length !== itemDescriptionsArray.length ||
-      productIdsArray.length !== itemUnitsArray.length ||
-      productIdsArray.length !== itemTaxesArray.length ||
-      productIdsArray.length !== itemDiscountsArray.length ||
-      productIdsArray.length !== itemPricesArray.length ||
-      productIdsArray.length !== itemStocksArray.length
+      productIdsArray.length !== cartCountsArray.length
+      
     ) {
       return res
         .status(400)
@@ -93,14 +75,7 @@ exports.createinvoice = async (req, res) => {
         UPDATE Invoice SET
           invoice_date = ?,
           customer_id = ?,
-          product_id = ?,
-          ItemCode = ?,
-          ItemDescription = ?,
-          ItemUnit = ?,
-          ItemTax = ?,
-          ItemDiscount = ?,
-          ItemPrice = ?,
-          Itemstock = ?,
+          product_id = ?, 
           product_actual_total = ?,
           product_discounted_total = ?,
           product_total = ?,
@@ -108,20 +83,14 @@ exports.createinvoice = async (req, res) => {
           orderstatus = ?,
           paymentmethod = ?,
           employee_id = ?
-        WHERE invoice_no = ? AND product_id = ?`;
-
+        WHERE invoice_no = ?
+          AND product_id = ?`;
+      
       for (let i = 0; i < productIdsArray.length; i++) {
         const updateValues = [
           invoice_date,
           customer_id,
-          productIdsArray[i],
-          itemCodesArray[i],
-          itemDescriptionsArray[i],
-          itemUnitsArray[i],
-          itemTaxesArray[i],
-          itemDiscountsArray[i],
-          itemPricesArray[i],
-          itemStocksArray[i],
+          productIdsArray[i],      
           product_actual_total,
           product_discounted_total,
           product_total,
@@ -130,7 +99,7 @@ exports.createinvoice = async (req, res) => {
           paymentmethod,
           employee_id,
           invoice_no,
-          productIdsArray[i],
+           productIdsArray[i],
         ];
 
         await new Promise((resolve, reject) => {
@@ -154,14 +123,7 @@ exports.createinvoice = async (req, res) => {
           invoice_no,
           invoice_date,
           customer_id,
-          product_id,
-          ItemCode,
-          ItemDescription,
-          ItemUnit,
-          ItemTax,
-          ItemDiscount,
-          ItemPrice,
-          Itemstock,
+          product_id,         
           product_actual_total,
           product_discounted_total,
           product_total,
@@ -170,7 +132,7 @@ exports.createinvoice = async (req, res) => {
           paymentmethod,
           employee_id
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
+        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
 
       for (let i = 0; i < productIdsArray.length; i++) {
         const insertValues = [
@@ -179,13 +141,7 @@ exports.createinvoice = async (req, res) => {
           invoice_date,
           customer_id,
           productIdsArray[i],
-          itemCodesArray[i],
-          itemDescriptionsArray[i],
-          itemUnitsArray[i],
-          itemTaxesArray[i],
-          itemDiscountsArray[i],
-          itemPricesArray[i],
-          itemStocksArray[i],
+
           product_actual_total,
           product_discounted_total,
           product_total,
@@ -219,6 +175,114 @@ exports.createinvoice = async (req, res) => {
 
 //find invoice
 
+// exports.getInvoiceAndCustomerDetails = async (req, res) => {
+//   try {
+//     console.log("Request Body:", req.body);
+
+//     const { invoice_no } = req.body;
+
+//     if (!invoice_no) {
+//       return res.status(400).json({ error: "Invoice number is required" });
+//     }
+
+//     // Query to fetch invoice details
+//     const invoiceSql = `SELECT * FROM Invoice WHERE invoice_no = ?`;
+//     const invoiceDetails = await new Promise((resolve, reject) => {
+//       db.query(invoiceSql, [invoice_no], (err, result) => {
+//         if (err) {
+//           console.error("Error:", err);
+//           reject(err);
+//         } else {
+//           resolve(result);
+//         }
+//       });
+//     });
+
+//     if (invoiceDetails.length === 0) {
+//       return res.status(404).json({ error: "Invoice not found" });
+//     }
+
+//     // Extract customer_id from the fetched invoice details
+//     const customer_id = invoiceDetails[0].customer_id;
+
+//     // Query to fetch customer details
+//     const customerSql = `SELECT * FROM customerTabele WHERE customer_id = ?`;
+//     const customerDetails = await new Promise((resolve, reject) => {
+//       db.query(customerSql, [customer_id], (err, result) => {
+//         if (err) {
+//           console.error("Error:", err);
+//           reject(err);
+//         } else {
+//           resolve(result);
+//         }
+//       });
+//     });
+
+//     if (customerDetails.length === 0) {
+//       return res.status(404).json({ error: "Customer not found" });
+//     }
+
+    
+//     // Extract customer_id from the fetched invoice details
+//     const product_id= invoiceDetails[0].product_id;
+
+//     // Query to fetch customer details
+//     const productSql = `SELECT * FROM iteamTabele  WHERE product_id = ?`;
+//     const productDetails = await new Promise((resolve, reject) => {
+//       db.query(productSql, [product_id], (err, result) => {
+//         if (err) {
+//           console.error("Error:", err);
+//           reject(err);
+//         } else {
+//           resolve(result);
+//         }
+//       });
+//     });
+
+//     if (productDetails .length === 0) {
+//       return res.status(404).json({ error: "Customer not found" });
+//     }
+
+//         // Extract customer_id from the fetched invoice details
+//         const employee_id= invoiceDetails[0].employee_id;
+
+//         // Query to fetch customer details
+//         const employeeSql = `SELECT * FROM users  WHERE user_id = ?`;
+//         const employeeDetails = await new Promise((resolve, reject) => {
+//           db.query(employeeSql, [employee_id], (err, result) => {
+//             if (err) {
+//               console.error("Error:", err);
+//               reject(err);
+//             } else {
+//               resolve(result);
+//             }
+//           });
+//         });
+    
+//         if (employeeDetails.length === 0) {
+//           return res.status(404).json({ error: "Customer not found" });
+//         }
+//     // Combine invoice and customer details
+//     const response = {
+//       invoiceDetails: invoiceDetails,
+//       customerDetails: customerDetails,
+//       employeeDetails: employeeDetails,
+//       productDetails:productDetails
+//     };
+
+//     res.status(200).json(response);
+//   } catch (err) {
+//     console.error("Error:", err);
+//     res
+//       .status(500)
+//       .json({
+//         error: "Failed to retrieve invoice and customer details",
+//         details: err.message,
+//       });
+//   }
+// };
+
+
 exports.getInvoiceAndCustomerDetails = async (req, res) => {
   try {
     console.log("Request Body:", req.body);
@@ -229,7 +293,7 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
       return res.status(400).json({ error: "Invoice number is required" });
     }
 
-    // Query to fetch invoice details
+    // Query to fetch invoice details and all associated product_ids
     const invoiceSql = `SELECT * FROM Invoice WHERE invoice_no = ?`;
     const invoiceDetails = await new Promise((resolve, reject) => {
       db.query(invoiceSql, [invoice_no], (err, result) => {
@@ -246,8 +310,9 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
       return res.status(404).json({ error: "Invoice not found" });
     }
 
-    // Extract customer_id from the fetched invoice details
+    // Extract customer_id and employee_id from the fetched invoice details
     const customer_id = invoiceDetails[0].customer_id;
+    const employee_id = invoiceDetails[0].employee_id;
 
     // Query to fetch customer details
     const customerSql = `SELECT * FROM customerTabele WHERE customer_id = ?`;
@@ -266,12 +331,8 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
       return res.status(404).json({ error: "Customer not found" });
     }
 
-    
-    // Extract customer_id from the fetched invoice details
-    const employee_id= invoiceDetails[0].employee_id;
-
-    // Query to fetch customer details
-    const employeeSql = `SELECT * FROM users  WHERE user_id = ?`;
+    // Query to fetch employee details
+    const employeeSql = `SELECT * FROM users WHERE user_id = ?`;
     const employeeDetails = await new Promise((resolve, reject) => {
       db.query(employeeSql, [employee_id], (err, result) => {
         if (err) {
@@ -284,23 +345,45 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
     });
 
     if (employeeDetails.length === 0) {
-      return res.status(404).json({ error: "Customer not found" });
+      return res.status(404).json({ error: "Employee not found" });
     }
-    // Combine invoice and customer details
+
+    // Extract all product_ids associated with the invoice
+    const productIds = invoiceDetails.map(invoice => invoice.product_id);
+
+    // Query to fetch product details for all product_ids
+    const productSql = `SELECT * FROM iteamTabele WHERE product_id IN (?)`;
+    const productDetails = await new Promise((resolve, reject) => {
+      db.query(productSql, [productIds], (err, result) => {
+        if (err) {
+          console.error("Error:", err);
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+
+    if (productDetails.length === 0) {
+      return res.status(404).json({ error: "Products not found" });
+    }
+
+    // Combine all details into the response
     const response = {
       invoiceDetails: invoiceDetails,
       customerDetails: customerDetails,
-      employeeDetails:employeeDetails,
+      employeeDetails: employeeDetails,
+      productDetails: productDetails
     };
+    
 
     res.status(200).json(response);
   } catch (err) {
     console.error("Error:", err);
-    res
-      .status(500)
-      .json({
-        error: "Failed to retrieve invoice and customer details",
-        details: err.message,
-      });
+    res.status(500).json({
+      error: "Failed to retrieve invoice and customer details",
+      details: err.message,
+    });
   }
 };
+

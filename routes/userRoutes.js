@@ -7,7 +7,10 @@ const authenticateToken = require('../middleware/authenticateToken');
 router.post("/signup", userController.signup);
 router.post("/login", userController.login);
 router.post('/logout',authenticateToken,userController.logout); // Use userController
-router.get('/allusers', authenticateToken, userController.getAllUsers); // Use userController
+// router.get('/allusers', authenticateToken, userController.getAllUsers); // Use userController
 router.post('/getuserbyemail', authenticateToken, userController.getUserByEmail); // Use userController
-
+router.put('/updateuser', authenticateToken, userController.updateUser); // Use userController
+router.post('/deleteuser', authenticateToken, userController.deleteuser);
+router.get('/getallemployee', authenticateToken, userController.getAllVisibleEmployees); 
 module.exports = router;
+
