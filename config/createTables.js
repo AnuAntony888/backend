@@ -35,6 +35,16 @@ const createTables = () => {
         );
     
   `;
+  const createcategoryTable = `
+
+    CREATE TABLE IF NOT EXISTS category (
+      category_id VARCHAR(255) PRIMARY KEY,
+      CategoryCode INT AUTO_INCREMENT UNIQUE,
+      CategoryDescription VARCHAR(255) NOT NULL,
+      visibility TINYINT DEFAULT 1
+        );
+    
+  `;
   const addVisibilityColumn = `
   ALTER TABLE suppliers ADD visibility TINYINT DEFAULT 1;
 `;
@@ -103,13 +113,7 @@ customerAddress VARCHAR(255) NOT NULL
   visibility TINYINT DEFAULT 1
   );
   `;
-  // ItemCode VARCHAR(255) NOT NULL,
-  // ItemDescription VARCHAR(255) NOT NULL,
-  // ItemUnit VARCHAR(255) NOT NULL,
-  // ItemTax DECIMAL(10, 2) NOT NULL,
-  // ItemDiscount DECIMAL(10, 2) NOT NULL,
-  // ItemPrice DECIMAL(10, 2) NOT NULL,
-  // ItemStock DECIMAL(10, 2) NOT NULL,
+
 
   // Function to run the queries
   const runQuery = (query, successMessage, errorMessage, callback) => {
@@ -154,6 +158,7 @@ customerAddress VARCHAR(255) NOT NULL
         "invoice table created or already exists.",
         "Error creating invoice table."
       );
+      runQuery(createcategoryTable, "create category");
       runQuery(createMasterTable,"create MasterTable")
       runQuery(addVisibilityColumn, "alter suppliertabel");
       runQuery(additeamTabeleColumn, "alter suppliertabel");
