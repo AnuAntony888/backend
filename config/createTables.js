@@ -20,37 +20,46 @@ const createTables = () => {
       employeecategory VARCHAR(255) NOT NULL,
       employeestatus VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL
+      password VARCHAR(255) NOT NULL,
+      visibility TINYINT DEFAULT 1
     );
   `;
-  const addusersTabeleColumn = `
-  ALTER TABLE users ADD visibility TINYINT DEFAULT 1;
-  `;
+  // const addusersTabeleColumn = `
+  // ALTER TABLE users ADD visibility TINYINT DEFAULT 1;
+  // `;
   const createSuppliersTable = `
     CREATE TABLE IF NOT EXISTS suppliers (
       user_id VARCHAR(255) PRIMARY KEY,
       SupplierCode INT AUTO_INCREMENT UNIQUE,
       SupplierDescription VARCHAR(255) NOT NULL,
-      SupplierAddress VARCHAR(255) NOT NULL 
+      SupplierAddress VARCHAR(255) NOT NULL ,
+      visibility TINYINT DEFAULT 1,
+      created_timestamp VARCHAR(255) NOT NULL,
+      created_by VARCHAR(255) NOT NULL,
+      updated_timestamp VARCHAR(255) NOT NULL,
+      updated_by VARCHAR(255) NOT NULL,
+      deleted_timestamp VARCHAR(255) NOT NULL,
+      deleted_by VARCHAR(255) NOT NULL
         );
     
   `;
+
   const createcategoryTable = `
 
     CREATE TABLE IF NOT EXISTS category (
       category_id VARCHAR(255) PRIMARY KEY,
       CategoryCode INT AUTO_INCREMENT UNIQUE,
       CategoryDescription VARCHAR(255) NOT NULL,
-      visibility TINYINT DEFAULT 1
+      visibility TINYINT DEFAULT 1,
+        created_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      created_by VARCHAR(255) NOT NULL,
+      updated_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_by VARCHAR(255) NOT NULL,
+      deleted_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      deleted_by VARCHAR(255) NOT NULL
         );
     
   `;
-  const addVisibilityColumn = `
-  ALTER TABLE suppliers ADD visibility TINYINT DEFAULT 1;
-`;
-  const additeamTabeleColumn = `
-ALTER TABLE iteamTabele ADD visibility TINYINT DEFAULT 1;
-`;
 
   const createIteamTable = `
   CREATE TABLE IF NOT EXISTS iteamTabele (
@@ -62,7 +71,14 @@ ALTER TABLE iteamTabele ADD visibility TINYINT DEFAULT 1;
     ItemTax DECIMAL(10, 2) NOT NULL,
     IteamDiscount DECIMAL(10, 2) NOT NULL,
     IteamPrice DECIMAL(10, 2) NOT NULL,
-    Iteamstock DECIMAL(10, 2) NOT NULL,    
+    Iteamstock DECIMAL(10, 2) NOT NULL,
+    visibility TINYINT DEFAULT 1,
+      created_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      created_by VARCHAR(255) NOT NULL,
+      updated_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_by VARCHAR(255) NOT NULL,
+      deleted_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      deleted_by VARCHAR(255) NOT NULL,
     FOREIGN KEY (ItemSupplier) REFERENCES suppliers(user_id) 
    
   );
@@ -94,7 +110,13 @@ customerAddress VARCHAR(255) NOT NULL
     cartCount INT NOT NULL,
     paymentmethod VARCHAR(255) NOT NULL,
     orderstatus VARCHAR(255) NOT NULL,
-    employee_id VARCHAR(255) NOT NULL,  
+    employee_id VARCHAR(255) NOT NULL,
+      created_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      created_by VARCHAR(255) NOT NULL,
+      updated_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_by VARCHAR(255) NOT NULL,
+      deleted_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      deleted_by VARCHAR(255) NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customerTabele(customer_id),
     FOREIGN KEY (product_id) REFERENCES iteamTabele(product_id),
     FOREIGN KEY (employee_id) REFERENCES users(user_id)
@@ -113,7 +135,6 @@ customerAddress VARCHAR(255) NOT NULL
   visibility TINYINT DEFAULT 1
   );
   `;
-
 
   // Function to run the queries
   const runQuery = (query, successMessage, errorMessage, callback) => {
@@ -159,10 +180,10 @@ customerAddress VARCHAR(255) NOT NULL
         "Error creating invoice table."
       );
       runQuery(createcategoryTable, "create category");
-      runQuery(createMasterTable,"create MasterTable")
-      runQuery(addVisibilityColumn, "alter suppliertabel");
-      runQuery(additeamTabeleColumn, "alter suppliertabel");
-      runQuery(addusersTabeleColumn, "uservisiblity");
+      runQuery(createMasterTable, "create MasterTable");
+      //  runQuery(addVisibilityColumn, "alter suppliertabel");
+      // runQuery(additeamTabeleColumn, "alter suppliertabel");
+      // runQuery(addusersTabeleColumn, "uservisiblity");
     }
   );
 };

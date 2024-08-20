@@ -173,115 +173,7 @@ exports.createinvoice = async (req, res) => {
   }
 };
 
-//find invoice
-
-// exports.getInvoiceAndCustomerDetails = async (req, res) => {
-//   try {
-//     console.log("Request Body:", req.body);
-
-//     const { invoice_no } = req.body;
-
-//     if (!invoice_no) {
-//       return res.status(400).json({ error: "Invoice number is required" });
-//     }
-
-//     // Query to fetch invoice details
-//     const invoiceSql = `SELECT * FROM Invoice WHERE invoice_no = ?`;
-//     const invoiceDetails = await new Promise((resolve, reject) => {
-//       db.query(invoiceSql, [invoice_no], (err, result) => {
-//         if (err) {
-//           console.error("Error:", err);
-//           reject(err);
-//         } else {
-//           resolve(result);
-//         }
-//       });
-//     });
-
-//     if (invoiceDetails.length === 0) {
-//       return res.status(404).json({ error: "Invoice not found" });
-//     }
-
-//     // Extract customer_id from the fetched invoice details
-//     const customer_id = invoiceDetails[0].customer_id;
-
-//     // Query to fetch customer details
-//     const customerSql = `SELECT * FROM customerTabele WHERE customer_id = ?`;
-//     const customerDetails = await new Promise((resolve, reject) => {
-//       db.query(customerSql, [customer_id], (err, result) => {
-//         if (err) {
-//           console.error("Error:", err);
-//           reject(err);
-//         } else {
-//           resolve(result);
-//         }
-//       });
-//     });
-
-//     if (customerDetails.length === 0) {
-//       return res.status(404).json({ error: "Customer not found" });
-//     }
-
-    
-//     // Extract customer_id from the fetched invoice details
-//     const product_id= invoiceDetails[0].product_id;
-
-//     // Query to fetch customer details
-//     const productSql = `SELECT * FROM iteamTabele  WHERE product_id = ?`;
-//     const productDetails = await new Promise((resolve, reject) => {
-//       db.query(productSql, [product_id], (err, result) => {
-//         if (err) {
-//           console.error("Error:", err);
-//           reject(err);
-//         } else {
-//           resolve(result);
-//         }
-//       });
-//     });
-
-//     if (productDetails .length === 0) {
-//       return res.status(404).json({ error: "Customer not found" });
-//     }
-
-//         // Extract customer_id from the fetched invoice details
-//         const employee_id= invoiceDetails[0].employee_id;
-
-//         // Query to fetch customer details
-//         const employeeSql = `SELECT * FROM users  WHERE user_id = ?`;
-//         const employeeDetails = await new Promise((resolve, reject) => {
-//           db.query(employeeSql, [employee_id], (err, result) => {
-//             if (err) {
-//               console.error("Error:", err);
-//               reject(err);
-//             } else {
-//               resolve(result);
-//             }
-//           });
-//         });
-    
-//         if (employeeDetails.length === 0) {
-//           return res.status(404).json({ error: "Customer not found" });
-//         }
-//     // Combine invoice and customer details
-//     const response = {
-//       invoiceDetails: invoiceDetails,
-//       customerDetails: customerDetails,
-//       employeeDetails: employeeDetails,
-//       productDetails:productDetails
-//     };
-
-//     res.status(200).json(response);
-//   } catch (err) {
-//     console.error("Error:", err);
-//     res
-//       .status(500)
-//       .json({
-//         error: "Failed to retrieve invoice and customer details",
-//         details: err.message,
-//       });
-//   }
-// };
-
+//get invoice
 
 exports.getInvoiceAndCustomerDetails = async (req, res) => {
   try {
@@ -386,4 +278,48 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
     });
   }
 };
+
+
+//invoice genrate
+exports.generateInvoiceNumber = async (req, res) => {
+  try {
+    const { date } = req.query; // Expecting date in 'YYYY-MM-DD' format from the client
+
+    const today = date ? new Date(date) : new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const datePart = `${year}${month}${day}`;
+
+    // Query to find the last invoice number for the given date
+    const lastInvoiceSql = `SELECT invoice_no FROM Invoice WHERE invoice_no LIKE ? ORDER BY invoice_no DESC LIMIT 1`;
+    const lastInvoiceNumber = await new Promise((resolve, reject) => {
+      db.query(lastInvoiceSql, [`INV-${datePart}%`], (err, result) => {
+        if (err) {
+          console.error("Error fetching last invoice number:", err);
+          reject(err);
+        } else {
+          resolve(result.length > 0 ? result[0].invoice_no : null);
+        }
+      });
+    });
+
+    let sequentialPart = 1;
+
+    if (lastInvoiceNumber) {
+      // Extract the sequential part from the last invoice number
+      const lastSequentialPart = parseInt(lastInvoiceNumber.split("-")[2], 10);
+      sequentialPart = lastSequentialPart + 1;
+    }
+
+    const sequentialPartStr = String(sequentialPart).padStart(4, "0");
+    const newInvoiceNumber = `INV-${datePart}-${sequentialPartStr}`;
+
+    // Send the generated invoice number as a response
+    res.status(200).json({ invoiceNumber: newInvoiceNumber });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to generate invoice number' });
+  }
+};
+
 

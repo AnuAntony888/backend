@@ -1,16 +1,17 @@
 const { v4: uuidv4 } = require("uuid");
 const db = require("../utils/db"); // Ensure you have a proper db connection setup
 
-
 //creat supplier
 exports.createSupplier = async (req, res) => {
   try {
     // Clean up field names by trimming whitespace
     const supplier = {
-     user_id: uuidv4(), // Generate unique user_id using uuidv4    
+      user_id: uuidv4(), // Generate unique user_id using uuidv4
       SupplierDescription: req.body.SupplierDescription.trim(),
       SupplierAddress: req.body.SupplierAddress.trim(),
-      visibility: 1 // Set visibility to 1 for newly created supplier
+      visibility: 1, // Set visibility to 1 for newly created supplier
+      created_timestamp: req.body.created_timestamp.trim(), // Add created_timestamp
+      created_by: req.body.created_by.trim(), // Add created_by
     };
 
     // Fetch the current maximum SupplierCode to determine the next code
@@ -26,21 +27,19 @@ exports.createSupplier = async (req, res) => {
       });
     });
 
+    // Calculate the new SupplierCode
+    let newSupplierCode = "000001"; // Default starting code
+    if (maxCodeResult) {
+      const maxCode = parseInt(maxCodeResult, 10);
+      newSupplierCode = (maxCode + 1).toString().padStart(6, "0");
+    }
 
-
-     // Calculate the new SupplierCode
-     let newSupplierCode = '000001'; // Default starting code
-     if (maxCodeResult) {
-       const maxCode = parseInt(maxCodeResult, 10);
-       newSupplierCode = (maxCode + 1).toString().padStart(6, '0');
-     }
- 
-     console.log("New SupplierCode:", newSupplierCode); // Log for debugging
+    console.log("New SupplierCode:", newSupplierCode); // Log for debugging
 
     // Explicitly list column names with correct field names
     const sql = `
-      INSERT INTO suppliers (user_id, SupplierCode, SupplierDescription, SupplierAddress,visibility)
-      VALUES (?, ?, ?, ?,?)
+      INSERT INTO suppliers (user_id, SupplierCode, SupplierDescription, SupplierAddress,visibility,created_timestamp,created_by)
+      VALUES (?, ?, ?, ?,?,?,?)
     `;
 
     const values = [
@@ -48,7 +47,9 @@ exports.createSupplier = async (req, res) => {
       newSupplierCode,
       supplier.SupplierDescription,
       supplier.SupplierAddress,
-      supplier.visibility
+      supplier.visibility,
+      supplier.created_timestamp,
+      supplier.created_by,
     ];
 
     // Use a Promise to handle the query asynchronously
@@ -78,7 +79,6 @@ exports.createSupplier = async (req, res) => {
 }
 
 exports.getSupplierById = (req, res) => {
-
   console.log("Request Body:", req.body);
 
   const { SupplierCode } = req.body;
@@ -86,12 +86,15 @@ exports.getSupplierById = (req, res) => {
   if (!SupplierCode) {
     return res.status(400).json({ error: "SupplierCode is required" });
   }
-const sql = "SELECT * FROM suppliers WHERE SupplierCode = ? AND visibility = 1";
-    // "SELECT * FROM suppliers WHERE SupplierCode = ?";
+  const sql =
+    "SELECT * FROM suppliers WHERE SupplierCode = ? AND visibility = 1";
+  // "SELECT * FROM suppliers WHERE SupplierCode = ?";
   db.query(sql, [SupplierCode], (err, results) => {
     if (err) {
       console.error("Database Error:", err);
-      return res.status(500).json({ error: "Failed to retrieve supplier details" });
+      return res
+        .status(500)
+        .json({ error: "Failed to retrieve supplier details" });
     }
     console.log("Query Results:", results);
     if (results.length === 0) {
@@ -101,7 +104,7 @@ const sql = "SELECT * FROM suppliers WHERE SupplierCode = ? AND visibility = 1";
     // res.status(200).json(supplier);
     res.status(200).json({
       message: "Supplier details retrieved successfully",
-      supplier: supplier
+      supplier: supplier,
     });
   });
 };
@@ -114,27 +117,39 @@ exports.updateSupplier = (req, res) => {
   console.log("Request Body:", req.body);
 
   // Extract the user_id, SupplierDescription, and SupplierAddress from the JSON body
-  const { SupplierCode, SupplierDescription, SupplierAddress,visibility } = req.body;
+  const {
+    SupplierCode,
+    SupplierDescription,
+    SupplierAddress,
+    visibility,
+    updated_timestamp,
+    updated_by,
+  } = req.body;
   console.log("SupplierCode received:", SupplierCode);
   console.log("Supplier Description received:", SupplierDescription);
   console.log("Supplier Address received:", SupplierAddress);
 
   if (!SupplierCode || !SupplierDescription || !SupplierAddress) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "SupplierCode, Supplier Description, and Supplier Address are required",
-      });
+    return res.status(400).json({
+      error:
+        "SupplierCode, Supplier Description, and Supplier Address are required",
+    });
   }
 
   const sql = `
       UPDATE suppliers 
-      SET SupplierDescription = ?, SupplierAddress = ? ,visibility = ? 
+      SET SupplierDescription = ?, SupplierAddress = ? ,visibility = ? ,updated_timestamp =?,updated_by=?
       WHERE SupplierCode = ?
     `;
 
-  const values = [SupplierDescription.trim(), SupplierAddress.trim(),  visibility !== undefined ? visibility : 1,  SupplierCode];
+  const values = [
+    SupplierDescription.trim(),
+    SupplierAddress.trim(),
+    visibility !== undefined ? visibility : 1,
+    updated_timestamp ? updated_timestamp.trim() : null,
+    updated_by ? updated_by.trim() : null,
+    SupplierCode,
+  ];
 
   db.query(sql, values, (err, result) => {
     if (err) {
@@ -154,18 +169,26 @@ exports.updateSupplier = (req, res) => {
   /**********************delete supplier using userid*************************************88 */
 }
 
-
 exports.deleteSupplier = (req, res) => {
-  const { SupplierCode } = req.body;
+  const { SupplierCode, deleted_timestamp, deleted_by } = req.body;
   if (!SupplierCode) {
     return res.status(400).json({ error: "SupplierCode is required" });
   }
 
-  const sql = "UPDATE suppliers SET visibility = 0 WHERE SupplierCode = ?";
-  db.query(sql, [SupplierCode], (err, result) => {
+  const sql =
+    "UPDATE suppliers SET visibility = ?,  deleted_timestamp =?,deleted_by =? WHERE SupplierCode = ?";
+  const values = [
+    (visibility = 0),
+    deleted_timestamp,
+    deleted_by,
+    SupplierCode,
+  ];
+  db.query(sql, values, (err, result) => {
     if (err) {
       console.error("Database Error:", err);
-      return res.status(500).json({ error: "Failed to update supplier visibility" });
+      return res
+        .status(500)
+        .json({ error: "Failed to update supplier visibility" });
     }
 
     if (result.affectedRows === 0) {
@@ -175,8 +198,6 @@ exports.deleteSupplier = (req, res) => {
     res.status(200).json({ message: "Supplier delete successfully" });
   });
 };
-
-
 
 // Get all Supplier
 exports.getAllSupplier = (req, res) => {
@@ -191,20 +212,22 @@ exports.getAllSupplier = (req, res) => {
   });
 };
 
-
 // Check supplier exist
 exports.checkSupplier = (req, res) => {
-  const { SupplierDescription} = req.body;
+  const { SupplierDescription } = req.body;
 
   if (!SupplierDescription) {
-    return res.status(400).json({ error: 'Supplier description is required' });
+    return res.status(400).json({ error: "Supplier description is required" });
   }
 
-  const query = 'SELECT * FROM suppliers WHERE SupplierDescription = ? AND visibility = 1';
+  const query =
+    "SELECT * FROM suppliers WHERE SupplierDescription = ? AND visibility = 1";
   db.query(query, [SupplierDescription], (err, results) => {
     if (err) {
-      console.error('Error executing query:', err);
-      return res.status(500).json({ error: 'Database query failed', details: err.message });
+      console.error("Error executing query:", err);
+      return res
+        .status(500)
+        .json({ error: "Database query failed", details: err.message });
     }
 
     if (results.length > 0) {
@@ -214,5 +237,3 @@ exports.checkSupplier = (req, res) => {
     }
   });
 };
-
-
