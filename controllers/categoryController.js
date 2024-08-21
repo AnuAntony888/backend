@@ -10,6 +10,8 @@ exports.createcategory = async (req, res) => {
       category_id: uuidv4(), // Correctly named as category_id
       CategoryDescription: req.body.CategoryDescription.trim(),
       visibility: 1, // Set visibility to 1 for newly created category
+      created_timestamp: req.body.created_timestamp.trim(), // Add created_timestamp
+      created_by: req.body.created_by.trim(), // Add created_by
     };
 
     // Get the maximum CategoryCode from the database
@@ -36,8 +38,9 @@ exports.createcategory = async (req, res) => {
 
     // Insert the new category into the database
     const sql = `
-      INSERT INTO category (category_id, CategoryCode, CategoryDescription, visibility)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO category (category_id, CategoryCode, CategoryDescription, visibility,
+      created_timestamp, created_by)
+      VALUES (?, ?, ?, ?,?,?)
     `;
 
     const values = [
@@ -45,6 +48,9 @@ exports.createcategory = async (req, res) => {
       newCategoryCode,
       category.CategoryDescription,
       category.visibility,
+      category.created_timestamp,
+      category.created_by
+
     ];
 
     console.log("Executing SQL:", sql, "with values:", values); // Log SQL execution
@@ -110,84 +116,7 @@ exports.getCategoryById = (req, res) => {
 {
   /***************update supplier using userid**********************************/
 }
-// exports.updateSupplier = (req, res) => {
-//   // Log the request body to ensure it's being received
-//   console.log("Request Body:", req.body);
 
-//   // Extract the user_id, SupplierDescription, and SupplierAddress from the JSON body
-//   const { SupplierCode, SupplierDescription, SupplierAddress,visibility } = req.body;
-//   console.log("SupplierCode received:", SupplierCode);
-//   console.log("Supplier Description received:", SupplierDescription);
-//   console.log("Supplier Address received:", SupplierAddress);
-
-//   if (!SupplierCode || !SupplierDescription || !SupplierAddress) {
-//     return res
-//       .status(400)
-//       .json({
-//         error:
-//           "SupplierCode, Supplier Description, and Supplier Address are required",
-//       });
-//   }
-
-//   const sql = `
-//       UPDATE suppliers
-//       SET SupplierDescription = ?, SupplierAddress = ? ,visibility = ?
-//       WHERE SupplierCode = ?
-//     `;
-
-//   const values = [SupplierDescription.trim(), SupplierAddress.trim(),  visibility !== undefined ? visibility : 1,  SupplierCode];
-
-//   db.query(sql, values, (err, result) => {
-//     if (err) {
-//       console.error("Database Error:", err);
-//       return res.status(500).json({ error: "Failed to update supplier" });
-//     }
-
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ error: "Supplier not found" });
-//     }
-
-//     res.status(200).json({ message: "Supplier updated successfully" });
-//   });
-// };
-
-// {
-//   /**********************delete supplier using userid*************************************88 */
-// }
-
-// exports.deleteSupplier = (req, res) => {
-//   const { SupplierCode } = req.body;
-//   if (!SupplierCode) {
-//     return res.status(400).json({ error: "SupplierCode is required" });
-//   }
-
-//   const sql = "UPDATE suppliers SET visibility = 0 WHERE SupplierCode = ?";
-//   db.query(sql, [SupplierCode], (err, result) => {
-//     if (err) {
-//       console.error("Database Error:", err);
-//       return res.status(500).json({ error: "Failed to update supplier visibility" });
-//     }
-
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ error: "Supplier not found" });
-//     }
-
-//     res.status(200).json({ message: "Supplier delete successfully" });
-//   });
-// };
-
-// // Get all Supplier
-// exports.getAllSupplier = (req, res) => {
-//   const sql = "SELECT * FROM suppliers WHERE visibility = 1";
-
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Database Error:", err);
-//       return res.status(500).json({ error: "Failed to retrieve products" });
-//     }
-//     res.status(200).json(results);
-//   });
-// };
 
 // // Check supplier exist
 exports.checkCategory = (req, res) => {
@@ -220,13 +149,21 @@ exports.checkCategory = (req, res) => {
 }
 
 exports.deleteCategory = (req, res) => {
-  const { CategoryCode } = req.body;
+  const { CategoryCode,
+    deleted_timestamp, deleted_by 
+  } = req.body;
   if (!CategoryCode) {
     return res.status(400).json({ error: "CategoryCode is required" });
   }
 
-  const sql = "UPDATE category SET visibility = 0 WHERE CategoryCode = ?";
-  db.query(sql, [CategoryCode], (err, result) => {
+  const sql = "UPDATE category SET visibility = ? ,deleted_timestamp =?,deleted_by =?  WHERE CategoryCode = ?";
+  const values = [
+    (visibility = 0),
+    deleted_timestamp,
+    deleted_by,
+   CategoryCode,
+  ];
+  db.query(sql,values,  (err, result) => {
     if (err) {
       console.error("Database Error:", err);
       return res
@@ -250,7 +187,10 @@ exports.updateCategory = (req, res) => {
   console.log("Request Body:", req.body);
 
   // Extract the CategoryCode, CategoryDescription, and visibility from the request body
-  const { CategoryCode, CategoryDescription, visibility } = req.body;
+  const { CategoryCode, CategoryDescription, visibility,
+    updated_timestamp,
+    updated_by,
+  } = req.body;
   console.log("CategoryCode received:", CategoryCode);
   console.log("CategoryDescription received:", CategoryDescription);
 
@@ -264,14 +204,17 @@ exports.updateCategory = (req, res) => {
   // SQL query to update the category
   const sql = `
     UPDATE category 
-    SET CategoryDescription = ?, visibility = ? 
+    SET CategoryDescription = ?, visibility = ?  ,   updated_timestamp=?,
+    updated_by =?
     WHERE CategoryCode = ?
   `;
 
   // Prepare values for the SQL query
   const values = [
     CategoryDescription.trim(),
-    visibility !== undefined ? visibility : 1, // Default visibility to 1 if not provided
+    visibility !== undefined ? visibility : 1,
+    updated_timestamp ? updated_timestamp.trim() : null,
+    updated_by ? updated_by.trim() : null,
     CategoryCode
   ];
 
@@ -290,3 +233,19 @@ exports.updateCategory = (req, res) => {
     res.status(200).json({ message: "Category updated successfully" });
   });
 };
+
+
+//get all category
+
+exports.getAllCategory = (req, res) => {
+  const sql = "SELECT * FROM category  WHERE visibility = 1";
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to retrieve products" });
+    }
+    res.status(200).json(results);
+  });
+};
+

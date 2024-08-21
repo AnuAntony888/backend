@@ -51,35 +51,40 @@ const createTables = () => {
       CategoryCode INT AUTO_INCREMENT UNIQUE,
       CategoryDescription VARCHAR(255) NOT NULL,
       visibility TINYINT DEFAULT 1,
-        created_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     created_timestamp VARCHAR(255) NOT NULL,
       created_by VARCHAR(255) NOT NULL,
-      updated_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_timestamp VARCHAR(255) NOT NULL,
       updated_by VARCHAR(255) NOT NULL,
-      deleted_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL
         );
     
   `;
-
+  const addusersTabeleColumn = `
+  ALTER TABLE iteamTabele
+  ADD ItemCategory VARCHAR(255) NOT NULL;
+  `;
   const createIteamTable = `
   CREATE TABLE IF NOT EXISTS iteamTabele (
   product_id VARCHAR(255) PRIMARY KEY,
     ItemCode VARCHAR(255) NOT NULL,
     ItemDescription VARCHAR(255) NOT NULL,    
-     ItemSupplier VARCHAR(255) NOT NULL, 
+     ItemSupplier VARCHAR(255) NOT NULL,
+     ItemCategory VARCHAR(255) NOT NULL,
     ItemUnit VARCHAR(255) NOT NULL,
     ItemTax DECIMAL(10, 2) NOT NULL,
     IteamDiscount DECIMAL(10, 2) NOT NULL,
     IteamPrice DECIMAL(10, 2) NOT NULL,
     Iteamstock DECIMAL(10, 2) NOT NULL,
     visibility TINYINT DEFAULT 1,
-      created_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_timestamp VARCHAR(255) NOT NULL,
       created_by VARCHAR(255) NOT NULL,
-      updated_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_timestamp VARCHAR(255) NOT NULL,
       updated_by VARCHAR(255) NOT NULL,
-      deleted_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
-    FOREIGN KEY (ItemSupplier) REFERENCES suppliers(user_id) 
+    FOREIGN KEY (ItemSupplier) REFERENCES suppliers(user_id),
+    FOREIGN KEY (ItemCategory) REFERENCES category(category_id)
    
   );
 `;
@@ -111,11 +116,11 @@ customerAddress VARCHAR(255) NOT NULL
     paymentmethod VARCHAR(255) NOT NULL,
     orderstatus VARCHAR(255) NOT NULL,
     employee_id VARCHAR(255) NOT NULL,
-      created_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_timestamp VARCHAR(255) NOT NULL,
       created_by VARCHAR(255) NOT NULL,
-      updated_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_timestamp VARCHAR(255) NOT NULL,
       updated_by VARCHAR(255) NOT NULL,
-      deleted_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customerTabele(customer_id),
     FOREIGN KEY (product_id) REFERENCES iteamTabele(product_id),
@@ -183,7 +188,7 @@ customerAddress VARCHAR(255) NOT NULL
       runQuery(createMasterTable, "create MasterTable");
       //  runQuery(addVisibilityColumn, "alter suppliertabel");
       // runQuery(additeamTabeleColumn, "alter suppliertabel");
-      // runQuery(addusersTabeleColumn, "uservisiblity");
+      //  runQuery(addusersTabeleColumn, "uservisiblity");
     }
   );
 };

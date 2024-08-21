@@ -8,6 +8,7 @@ exports.createIteame = async (req, res) => {
       ItemCode,
       ItemDescription,
       ItemSupplier,
+      ItemCategory,
       ItemUnit,
       ItemTax,
       IteamDiscount,
@@ -22,6 +23,7 @@ exports.createIteame = async (req, res) => {
       !ItemCode ||
       !ItemDescription ||
       !ItemSupplier ||
+      !ItemCategory ||
       !ItemUnit ||
       !ItemTax ||
       !IteamDiscount ||
@@ -44,23 +46,47 @@ exports.createIteame = async (req, res) => {
 
       const supplierID = supplierRows[0].user_id;
 
-      const checkSql = `SELECT * FROM iteamTabele WHERE ItemCode = ? AND ItemSupplier = ?`;
-      db.query(checkSql, [ItemCode, supplierID], (err, existingItems) => {
+
+
+
+
+
+
+
+
+
+
+      const getCategorySql = `SELECT category_id FROM category WHERE CategoryDescription = ?`;
+      db.query(getCategorySql, [ItemCategory], (err, supplierRows) => {
         if (err) {
           console.error("Error:", err);
           return res.status(500).json({ error: "Database query failed", details: err.message });
         }
-
-        if (existingItems.length > 0) {
-          return res.status(500).json({ error: "Item with the same ItemCode and Supplier already exists" });
+  
+        if (categoryRows.length === 0) {
+          return res.status(400).json({ error: "Category not found" });
         }
+  
+        const categoryID = categoryRows[0].category_id;
 
-        const insertSql = `
+        const checkSql = `SELECT * FROM iteamTabele WHERE ItemCode = ? AND ItemSupplier = ?`;
+        db.query(checkSql, [ItemCode, supplierID, categoryID], (err, existingItems) => {
+          if (err) {
+            console.error("Error:", err);
+            return res.status(500).json({ error: "Database query failed", details: err.message });
+          }
+
+          if (existingItems.length > 0) {
+            return res.status(500).json({ error: "Item with the same ItemCode and Supplier already exists" });
+          }
+
+          const insertSql = `
           INSERT INTO iteamTabele (
             product_id,
             ItemCode,
             ItemDescription,
             ItemSupplier,
+            ItemCategory,
             ItemUnit,
             ItemTax,
             IteamDiscount,
@@ -68,28 +94,30 @@ exports.createIteame = async (req, res) => {
             Iteamstock,
             visibility
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
         `;
-        const insertValues = [
-          uuidv4(),
-          ItemCode,
-          ItemDescription,
-          supplierID,
-          ItemUnit,
-          ItemTax,
-          IteamDiscount,
-          IteamPrice,
-          Iteamstock,
-          visibility // Include visibility in insert
-        ];
+          const insertValues = [
+            uuidv4(),
+            ItemCode,
+            ItemDescription,
+            supplierID,
+            categoryID,
+            ItemUnit,
+            ItemTax,
+            IteamDiscount,
+            IteamPrice,
+            Iteamstock,
+            visibility // Include visibility in insert
+          ];
 
-        db.query(insertSql, insertValues, (err, result) => {
-          if (err) {
-            console.error("Error:", err);
-            return res.status(500).json({ error: "Database insert failed", details: err.message });
-          }
+          db.query(insertSql, insertValues, (err, result) => {
+            if (err) {
+              console.error("Error:", err);
+              return res.status(500).json({ error: "Database insert failed", details: err.message });
+            }
 
-          res.status(201).json({ message: "Item created successfully" });
+            res.status(201).json({ message: "Item created successfully" });
+          });
         });
       });
     });
