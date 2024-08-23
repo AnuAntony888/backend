@@ -19,7 +19,7 @@ exports.createCustomer = async (req, res) => {
       !customerContactNo ||
       !customerTownCity ||
       !customerPin ||
-      !customerGSTN ||
+   
       !customerAddress
     ) {
       return res

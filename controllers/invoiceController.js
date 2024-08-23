@@ -1,8 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const db = require("../utils/db");
 
-
-
 exports.createinvoice = async (req, res) => {
   try {
     const {
@@ -10,7 +8,6 @@ exports.createinvoice = async (req, res) => {
       invoice_date,
       customer_id,
       product_id,
-      
       paymentmethod,
       product_actual_total,
       product_discounted_total,
@@ -18,6 +15,8 @@ exports.createinvoice = async (req, res) => {
       cartCount,
       orderstatus,
       employee_id,
+      created_by,
+      updated_by,
     } = req.body;
 
     // Ensure required fields are present
@@ -43,17 +42,11 @@ exports.createinvoice = async (req, res) => {
     const productIdsArray = JSON.parse(product_id);
     const cartCountsArray = JSON.parse(cartCount);
 
-
     // Validate lengths of arrays
-    if (
-      productIdsArray.length !== cartCountsArray.length
-      
-    ) {
-      return res
-        .status(400)
-        .json({
-          error: "Mismatch in array lengths for products and their details",
-        });
+    if (productIdsArray.length !== cartCountsArray.length) {
+      return res.status(400).json({
+        error: "Mismatch in array lengths for products and their details",
+      });
     }
 
     // Check if invoice_no already exists
@@ -82,15 +75,17 @@ exports.createinvoice = async (req, res) => {
           cartCount = ?,
           orderstatus = ?,
           paymentmethod = ?,
-          employee_id = ?
+          employee_id = ?,
+              updated_timestamp = CURRENT_TIMESTAMP,
+              updated_by = ?
         WHERE invoice_no = ?
           AND product_id = ?`;
-      
+
       for (let i = 0; i < productIdsArray.length; i++) {
         const updateValues = [
           invoice_date,
           customer_id,
-          productIdsArray[i],      
+          productIdsArray[i],
           product_actual_total,
           product_discounted_total,
           product_total,
@@ -98,10 +93,11 @@ exports.createinvoice = async (req, res) => {
           orderstatus,
           paymentmethod,
           employee_id,
+          updated_by,
           invoice_no,
-           productIdsArray[i],
+          productIdsArray[i],
         ];
-
+        console.log("updateValues invoice:", updateSql, updateValues);
         await new Promise((resolve, reject) => {
           db.query(updateSql, updateValues, (err, result) => {
             if (err) {
@@ -130,9 +126,11 @@ exports.createinvoice = async (req, res) => {
           cartCount,
           orderstatus,
           paymentmethod,
-          employee_id
+          employee_id,
+          created_timestamp,
+          created_by
         )
-        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
+        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,CURRENT_TIMESTAMP, ?)`;
 
       for (let i = 0; i < productIdsArray.length; i++) {
         const insertValues = [
@@ -149,8 +147,9 @@ exports.createinvoice = async (req, res) => {
           orderstatus,
           paymentmethod,
           employee_id,
+          created_by,
         ];
-
+        console.log("insertValues invoice:", insertValues);
         await new Promise((resolve, reject) => {
           db.query(insertSql, insertValues, (err, result) => {
             if (err) {
@@ -241,7 +240,7 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
     }
 
     // Extract all product_ids associated with the invoice
-    const productIds = invoiceDetails.map(invoice => invoice.product_id);
+    const productIds = invoiceDetails.map((invoice) => invoice.product_id);
 
     // Query to fetch product details for all product_ids
     const productSql = `SELECT * FROM iteamTabele WHERE product_id IN (?)`;
@@ -265,9 +264,8 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
       invoiceDetails: invoiceDetails,
       customerDetails: customerDetails,
       employeeDetails: employeeDetails,
-      productDetails: productDetails
+      productDetails: productDetails,
     };
-    
 
     res.status(200).json(response);
   } catch (err) {
@@ -278,7 +276,6 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
     });
   }
 };
-
 
 //invoice genrate
 exports.generateInvoiceNumber = async (req, res) => {
@@ -318,8 +315,6 @@ exports.generateInvoiceNumber = async (req, res) => {
     // Send the generated invoice number as a response
     res.status(200).json({ invoiceNumber: newInvoiceNumber });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to generate invoice number' });
+    res.status(500).json({ error: "Failed to generate invoice number" });
   }
 };
-
-

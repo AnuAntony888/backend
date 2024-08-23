@@ -7,6 +7,6 @@ router.post('/createiteam',authenticateToken, IteamController.createIteame);
  router.post('/getitembyitemcode',authenticateToken, IteamController.getItemByItemcode); // Endpoint to get supplier details by user_id
 router.put('/updateitem',authenticateToken, IteamController.updateItem);
 router.post('/deleteitem', authenticateToken, IteamController.deleteItem);
-router.get('/getAllItems', authenticateToken, IteamController.getAllItems);
-router.post('/getItemsBySupplierName',authenticateToken,IteamController.getItemsBySupplierName);
+router.post('/getAllItems', authenticateToken, IteamController.getAllItems);
+
 module.exports = router;

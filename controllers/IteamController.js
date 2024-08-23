@@ -29,9 +29,8 @@ exports.createIteame = async (req, res) => {
       !ItemTax ||
       !IteamDiscount ||
       !IteamPrice ||
-      !Iteamstock ||
-      !created_timestamp ||
-      !created_by
+      !Iteamstock 
+   
     ) {
       return res
         .status(400)
@@ -348,28 +347,24 @@ exports.deleteItem = (req, res) => {
 };
 
 
-//get all iteam details
+
+
+
+// Function to get items by supplier name
+
+
+
 exports.getAllItems = (req, res) => {
-  // Query to get all item details where visibility is 1
-  const getItemSql = "SELECT * FROM iteamtabele WHERE visibility = 1";
+  const { SupplierDescription } = req.body;
 
-  db.query(getItemSql, (err, itemResults) => {
-    if (err) {
-      console.error("Database Error:", err);
-      return res.status(500).json({ error: "Failed to retrieve items" });
-    }
-
-    if (itemResults.length === 0) {
-      return res.status(404).json({ error: "No items found" });
-    }
-
+  // Helper function to fetch and map data
+  const fetchAndMapData = (items) => {
     // Extract unique ItemSupplier IDs and ItemCategory IDs from item results
-    const supplierIds = [...new Set(itemResults.map((item) => item.ItemSupplier))];
-    const categoryIds = [...new Set(itemResults.map((item) => item.ItemCategory))];
+    const supplierIds = [...new Set(items.map((item) => item.ItemSupplier))];
+    const categoryIds = [...new Set(items.map((item) => item.ItemCategory))];
 
     // Query to get supplier descriptions
-    const getSupplierSql =
-      "SELECT user_id, SupplierDescription FROM suppliers WHERE user_id IN (?)";
+    const getSupplierSql = "SELECT user_id, SupplierDescription FROM suppliers WHERE user_id IN (?)";
     db.query(getSupplierSql, [supplierIds], (err, supplierResults) => {
       if (err) {
         console.error("Database Error:", err);
@@ -383,9 +378,8 @@ exports.getAllItems = (req, res) => {
       });
 
       // Query to get category descriptions
-      const getCategorysSql =
-        "SELECT category_id, CategoryDescription FROM category WHERE category_id IN (?)";
-      db.query(getCategorysSql, [categoryIds], (err, categoryResults) => {
+      const getCategorySql = "SELECT category_id, CategoryDescription FROM category WHERE category_id IN (?)";
+      db.query(getCategorySql, [categoryIds], (err, categoryResults) => {
         if (err) {
           console.error("Database Error:", err);
           return res.status(500).json({ error: "Failed to retrieve categories" });
@@ -398,7 +392,7 @@ exports.getAllItems = (req, res) => {
         });
 
         // Replace ItemSupplier ID and ItemCategory ID with their descriptions
-        const updatedItems = itemResults.map((item) => ({
+        const updatedItems = items.map((item) => ({
           ...item,
           ItemSupplier: supplierMap[item.ItemSupplier] || item.ItemSupplier,
           ItemCategory: categoryMap[item.ItemCategory] || item.ItemCategory,
@@ -408,89 +402,52 @@ exports.getAllItems = (req, res) => {
         res.status(200).json(updatedItems);
       });
     });
-  });
-};
+  };
 
-
-
-// Function to get items by supplier name
-
-exports.getItemsBySupplierName = (req, res) => {
-  console.log("Request Body:", req.body);
-
-  const { SupplierDescription } = req.body;
-  if (!SupplierDescription) {
-    return res.status(400).json({ error: "SupplierDescription is required" });
-  }
-
-  // Step 1: Get supplier ID from the suppliers table
-  const getSupplierIdSql = `SELECT user_id FROM suppliers WHERE SupplierDescription = ?`;
-  db.query(getSupplierIdSql, [SupplierDescription], (err, supplierRows) => {
-    if (err) {
-      console.error("Database Error while fetching supplier ID:", err);
-      return res.status(500).json({ error: "Failed to retrieve supplier ID" });
-    }
-
-    if (supplierRows.length === 0) {
-      return res.status(404).json({ error: "Supplier not found" });
-    }
-
-    const supplierID = supplierRows[0].user_id;
-    console.log("Supplier ID:", supplierID);
-
-    // Step 2: Get items by supplier ID
-    const getItemsSql = `SELECT * FROM iteamTabele WHERE ItemSupplier = ? AND visibility = 1`;
-    db.query(getItemsSql, [supplierID], (err, itemResults) => {
+  if (SupplierDescription) {
+    // Step 1: Get supplier ID from the suppliers table
+    const getSupplierIdSql = "SELECT user_id FROM suppliers WHERE SupplierDescription = ?";
+    db.query(getSupplierIdSql, [SupplierDescription], (err, supplierRows) => {
       if (err) {
-        console.error("Database Error while fetching items:", err);
+        console.error("Database Error while fetching supplier ID:", err);
+        return res.status(500).json({ error: "Failed to retrieve supplier ID" });
+      }
+
+      if (supplierRows.length === 0) {
+        return res.status(404).json({ error: "Supplier not found" });
+      }
+
+      const supplierID = supplierRows[0].user_id;
+
+      // Step 2: Get items by supplier ID
+      const getItemsSql = "SELECT * FROM iteamTabele WHERE ItemSupplier = ? AND visibility = 1";
+      db.query(getItemsSql, [supplierID], (err, itemResults) => {
+        if (err) {
+          console.error("Database Error while fetching items:", err);
+          return res.status(500).json({ error: "Failed to retrieve items" });
+        }
+
+        if (itemResults.length === 0) {
+          return res.status(404).json({ error: "No items found for this supplier" });
+        }
+
+        fetchAndMapData(itemResults);
+      });
+    });
+  } else {
+    // Step 1: Get all items where visibility is 1
+    const getItemSql = "SELECT * FROM iteamtabele WHERE visibility = 1";
+    db.query(getItemSql, (err, itemResults) => {
+      if (err) {
+        console.error("Database Error:", err);
         return res.status(500).json({ error: "Failed to retrieve items" });
       }
 
       if (itemResults.length === 0) {
-        return res.status(404).json({ error: "No items found for this supplier" });
+        return res.status(404).json({ error: "No items found" });
       }
 
-      // Step 3: Fetch all suppliers to create a mapping of IDs to descriptions
-      const getAllSuppliersSql = `SELECT user_id, SupplierDescription FROM suppliers`;
-      db.query(getAllSuppliersSql, (err, supplierResults) => {
-        if (err) {
-          console.error("Database Error while fetching suppliers:", err);
-          return res.status(500).json({ error: "Failed to retrieve suppliers" });
-        }
-
-        // Create a mapping of supplier IDs to descriptions
-        const supplierMap = {};
-        supplierResults.forEach((supplier) => {
-          supplierMap[supplier.user_id] = supplier.SupplierDescription;
-        });
-
-        // Step 4: Fetch all categories to create a mapping of IDs to descriptions
-        const categoryIds = itemResults.map(item => item.ItemCategory);
-        const getCategoriesSql = "SELECT category_id, CategoryDescription FROM category WHERE category_id IN (?)";
-        db.query(getCategoriesSql, [categoryIds], (err, categoryResults) => {
-          if (err) {
-            console.error("Database Error while fetching categories:", err);
-            return res.status(500).json({ error: "Failed to retrieve categories" });
-          }
-
-          // Create a mapping of category IDs to descriptions
-          const categoryMap = {};
-          categoryResults.forEach((category) => {
-            categoryMap[category.category_id] = category.CategoryDescription;
-          });
-
-          // Replace ItemSupplier ID and ItemCategory ID with their descriptions
-          const updatedItems = itemResults.map((item) => ({
-            ...item,
-            ItemSupplier: supplierMap[item.ItemSupplier] || item.ItemSupplier,
-            ItemCategory: categoryMap[item.ItemCategory] || item.ItemCategory,
-          }));
-
-          // Send the results to the frontend
-          res.status(200).json(updatedItems);
-        });
-      });
+      fetchAndMapData(itemResults);
     });
-  });
+  }
 };
-
