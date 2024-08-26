@@ -21,12 +21,17 @@ const createTables = () => {
       employeestatus VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL UNIQUE,
       password VARCHAR(255) NOT NULL,
-      visibility TINYINT DEFAULT 1
+      master_id VARCHAR(255),
+      visibility TINYINT DEFAULT 1,
+      FOREIGN KEY (master_id) REFERENCES masterTabele(master_id)
     );
   `;
-  // const addusersTabeleColumn = `
-  // ALTER TABLE users ADD visibility TINYINT DEFAULT 1;
-  // `;
+//   const addusersTabeleColumn = `
+// ALTER TABLE users 
+// ADD master_id VARCHAR(255) NOT NULL,
+//     FOREIGN KEY (master_id) REFERENCES masterTabel(master_id);
+
+// `;
   const createSuppliersTable = `
     CREATE TABLE IF NOT EXISTS suppliers (
       user_id VARCHAR(255) PRIMARY KEY,
@@ -60,10 +65,7 @@ const createTables = () => {
         );
     
   `;
-  const addusersTabeleColumn = `
-  ALTER TABLE iteamTabele
-  ADD ItemCategory VARCHAR(255) NOT NULL;
-  `;
+
   const createIteamTable = `
   CREATE TABLE IF NOT EXISTS iteamTabele (
   product_id VARCHAR(255) PRIMARY KEY,
@@ -188,7 +190,7 @@ customerAddress VARCHAR(255) NOT NULL
       runQuery(createMasterTable, "create MasterTable");
       //  runQuery(addVisibilityColumn, "alter suppliertabel");
       // runQuery(additeamTabeleColumn, "alter suppliertabel");
-      //  runQuery(addusersTabeleColumn, "uservisiblity");
+      //  runQuery(addusersTabeleColumn, "usermastervisiblity");
     }
   );
 };

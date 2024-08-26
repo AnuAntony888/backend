@@ -155,113 +155,15 @@ const sql = "SELECT * FROM masterTabele WHERE entityName = ? AND visibility = 1"
   });
 };
 
-// {
-//   /***************update supplier using userid**********************************/
-// }
-// exports.updateSupplier = (req, res) => {
-//   // Log the request body to ensure it's being received
-//   console.log("Request Body:", req.body);
+// Get all Supplier
+exports.getAllMaster = (req, res) => {
+  const sql = "SELECT * FROM masterTabele WHERE visibility = 1";
 
-//   // Extract the user_id, SupplierDescription, and SupplierAddress from the JSON body
-//   const { SupplierCode, SupplierDescription, SupplierAddress,visibility } = req.body;
-//   console.log("SupplierCode received:", SupplierCode);
-//   console.log("Supplier Description received:", SupplierDescription);
-//   console.log("Supplier Address received:", SupplierAddress);
-
-//   if (!SupplierCode || !SupplierDescription || !SupplierAddress) {
-//     return res
-//       .status(400)
-//       .json({
-//         error:
-//           "SupplierCode, Supplier Description, and Supplier Address are required",
-//       });
-//   }
-
-//   const sql = `
-//       UPDATE suppliers 
-//       SET SupplierDescription = ?, SupplierAddress = ? ,visibility = ? 
-//       WHERE SupplierCode = ?
-//     `;
-
-//   const values = [SupplierDescription.trim(), SupplierAddress.trim(),  visibility !== undefined ? visibility : 1,  SupplierCode];
-
-//   db.query(sql, values, (err, result) => {
-//     if (err) {
-//       console.error("Database Error:", err);
-//       return res.status(500).json({ error: "Failed to update supplier" });
-//     }
-
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ error: "Supplier not found" });
-//     }
-
-//     res.status(200).json({ message: "Supplier updated successfully" });
-//   });
-// };
-
-// {
-//   /**********************delete supplier using userid*************************************88 */
-// }
-
-
-// exports.deleteSupplier = (req, res) => {
-//   const { SupplierCode } = req.body;
-//   if (!SupplierCode) {
-//     return res.status(400).json({ error: "SupplierCode is required" });
-//   }
-
-//   const sql = "UPDATE suppliers SET visibility = 0 WHERE SupplierCode = ?";
-//   db.query(sql, [SupplierCode], (err, result) => {
-//     if (err) {
-//       console.error("Database Error:", err);
-//       return res.status(500).json({ error: "Failed to update supplier visibility" });
-//     }
-
-//     if (result.affectedRows === 0) {
-//       return res.status(404).json({ error: "Supplier not found" });
-//     }
-
-//     res.status(200).json({ message: "Supplier delete successfully" });
-//   });
-// };
-
-
-
-// // Get all Supplier
-// exports.getAllSupplier = (req, res) => {
-//   const sql = "SELECT * FROM suppliers WHERE visibility = 1";
-
-//   db.query(sql, (err, results) => {
-//     if (err) {
-//       console.error("Database Error:", err);
-//       return res.status(500).json({ error: "Failed to retrieve products" });
-//     }
-//     res.status(200).json(results);
-//   });
-// };
-
-
-// // Check supplier exist
-// exports.checkSupplier = (req, res) => {
-//   const { SupplierDescription} = req.body;
-
-//   if (!SupplierDescription) {
-//     return res.status(400).json({ error: 'Supplier description is required' });
-//   }
-
-//   const query = 'SELECT * FROM suppliers WHERE SupplierDescription = ? AND visibility = 1';
-//   db.query(query, [SupplierDescription], (err, results) => {
-//     if (err) {
-//       console.error('Error executing query:', err);
-//       return res.status(500).json({ error: 'Database query failed', details: err.message });
-//     }
-
-//     if (results.length > 0) {
-//       res.status(200).json({ exists: true });
-//     } else {
-//       res.status(200).json({ exists: false });
-//     }
-//   });
-// };
-
-
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to retrieve products" });
+    }
+    res.status(200).json(results);
+  });
+};

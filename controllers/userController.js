@@ -10,84 +10,7 @@ const JWT_EXPIRATION = process.env.JWT_EXPIRATION || "360d";
 
 let tokenBlacklist = []; // In-memory blacklist, use a persistent store in production
 
-// exports.signup = async (req, res) => {
-//   const {
-//     name,
-//     email,
-//     password,
-//     employeeno,
-//     employeecategory,
-//     employeestatus,
-//     visibility = 1
-//   } = req.body;
 
-//   if (!name || !email || !password) {
-//     return res
-//       .status(400)
-//       .json({ error: "Name, email, and password are required" });
-//   }
-
-//   if (password.length < 8) {
-//     return res
-//       .status(400)
-//       .json({ error: "Password must be at least 8 characters long" });
-//   }
-
-//   db.query(
-//     "SELECT * FROM users WHERE email = ? ",
-//     [email],
-//     async (err, results) => {
-//       if (err) {
-//         console.error("Error checking existing email:", err);
-//         return res
-//           .status(500)
-//           .json({ error: "An error occurred while checking email." });
-//       }
-
-//       if (results.length > 0) {
-//         return res.status(400).json({ error: "Email already in use" });
-//       }
-
-//       try {
-//         const saltRounds = 10;
-//         const hashedPassword = await bcrypt.hash(password, saltRounds);
-//         const user_id = uuidv4();
-//         db.query(
-//           "INSERT INTO users (user_id,name, email, password,employeeno,employeecategory,employeestatus) VALUES(?,?,?,?, ?, ?,?)",
-//           [
-//             user_id,
-//             name,
-//             email,
-//             hashedPassword,
-//             employeeno,
-//             employeecategory,
-//             employeestatus,
-//           ],
-//           (err, results) => {
-//             if (err) {
-//               console.error("Error inserting user:", err);
-//               return res
-//                 .status(500)
-//                 .send("An error occurred while adding the user.");
-//             }
-
-//             res.json({
-//               user_id: results.insertId,
-//               name,
-//               email,
-//               employeeno,
-//               employeecategory,
-//               employeestatus,
-//             });
-//           }
-//         );
-//       } catch (error) {
-//         console.error("Error hashing password:", error);
-//         res.status(500).send("An error occurred while hashing the password.");
-//       }
-//     }
-//   );
-// };
 exports.signup = async (req, res) => {
   const {
     name,
@@ -96,6 +19,7 @@ exports.signup = async (req, res) => {
     employeeno,
     employeecategory,
     employeestatus,
+    master_id,
     visibility = 1, // Default visibility to 1
   } = req.body;
 
@@ -138,6 +62,7 @@ exports.signup = async (req, res) => {
               employeeno = ?,
               employeecategory = ?,
               employeestatus = ?,
+              master_id = ?,
               visibility = ?
             WHERE email = ?
           `;
@@ -152,6 +77,7 @@ exports.signup = async (req, res) => {
               employeeno,
               employeecategory,
               employeestatus,
+              master_id,
               visibility,
               email,
             ],
@@ -180,7 +106,7 @@ exports.signup = async (req, res) => {
           const user_id = uuidv4();
 
           db.query(
-            "INSERT INTO users (user_id, name, email, password, employeeno, employeecategory, employeestatus, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO users (user_id, name, email, password, employeeno, employeecategory, employeestatus,  master_id, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)",
             [
               user_id,
               name,
@@ -189,6 +115,7 @@ exports.signup = async (req, res) => {
               employeeno,
               employeecategory,
               employeestatus,
+              master_id,
               visibility,
             ],
             (err, results) => {
@@ -206,6 +133,7 @@ exports.signup = async (req, res) => {
                 employeeno,
                 employeecategory,
                 employeestatus,
+                master_id,
                 visibility,
               });
             }
@@ -415,7 +343,7 @@ exports.isTokenBlacklisted = (token) => {
 
 exports.getAllVisibleEmployees = (req, res) => {
   const query = `
-    SELECT employeeno, name, email
+    SELECT employeeno, name, email ,employeecategory
     FROM users
     WHERE visibility = 1 AND employeestatus = 'employee'
   `;
@@ -434,3 +362,46 @@ exports.getAllVisibleEmployees = (req, res) => {
     res.status(200).json(results);
   });
 };
+
+//employee number
+exports.generateemployeeNumber = async (req, res) => {
+  try {
+    const { date } = req.query; // Expecting date in 'YYYY-MM-DD' format from the client
+
+    const today = date ? new Date(date) : new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const datePart = `${year}${month}${day}`;
+
+    // Query to find the last invoice number for the given date
+    const lastemployeeSql = `SELECT employeeno FROM users WHERE employeeno LIKE ? ORDER BY employeeno DESC LIMIT 1`;
+    const lastemployeeeNumber = await new Promise((resolve, reject) => {
+      db.query(lastemployeeSql, [`EMP-${datePart}%`], (err, result) => {
+        if (err) {
+          console.error("Error fetching last invoice number:", err);
+          reject(err);
+        } else {
+          resolve(result.length > 0 ? result[0].invoice_no : null);
+        }
+      });
+    });
+
+    let sequentialPart = 1;
+
+    if (lastemployeeeNumber) {
+      // Extract the sequential part from the last invoice number
+      const lastSequentialPart = parseInt(lastemployeeeNumber.split("-")[2], 10);
+      sequentialPart = lastSequentialPart + 1;
+    }
+
+    const sequentialPartStr = String(sequentialPart).padStart(4, "0");
+    const newEmployeeNumber = `INV-${datePart}-${sequentialPartStr}`;
+
+    // Send the generated invoice number as a response
+    res.status(200).json({ EmployeeNumber: newEmployeeNumber });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to generate invoice number" });
+  }
+};
+
