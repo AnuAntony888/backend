@@ -12,6 +12,7 @@ exports.createSupplier = async (req, res) => {
       visibility: 1, // Set visibility to 1 for newly created supplier
       created_timestamp: req.body.created_timestamp.trim(), // Add created_timestamp
       created_by: req.body.created_by.trim(), // Add created_by
+      master_id: req.body.master_id.trim(),
     };
 
     // Fetch the current maximum SupplierCode to determine the next code
@@ -38,8 +39,9 @@ exports.createSupplier = async (req, res) => {
 
     // Explicitly list column names with correct field names
     const sql = `
-      INSERT INTO suppliers (user_id, SupplierCode, SupplierDescription, SupplierAddress,visibility,created_timestamp,created_by)
-      VALUES (?, ?, ?, ?,?,?,?)
+      INSERT INTO suppliers (user_id, SupplierCode, SupplierDescription, SupplierAddress,visibility,created_timestamp,created_by,
+      master_id)
+      VALUES (?, ?, ?, ?,?,?,?,?)
     `;
 
     const values = [
@@ -50,6 +52,7 @@ exports.createSupplier = async (req, res) => {
       supplier.visibility,
       supplier.created_timestamp,
       supplier.created_by,
+      supplier.master_id,
     ];
 
     // Use a Promise to handle the query asynchronously
@@ -81,15 +84,18 @@ exports.createSupplier = async (req, res) => {
 exports.getSupplierById = (req, res) => {
   console.log("Request Body:", req.body);
 
-  const { SupplierCode } = req.body;
+  const { SupplierCode, master_id } = req.body;
   console.log("SupplierCode received:", SupplierCode);
-  if (!SupplierCode) {
-    return res.status(400).json({ error: "SupplierCode is required" });
+  if (!SupplierCode || !master_id) {
+    return res
+      .status(400)
+      .json({ error: "SupplierCode and master_id are required" });
   }
+
   const sql =
-    "SELECT * FROM suppliers WHERE SupplierCode = ? AND visibility = 1";
-  // "SELECT * FROM suppliers WHERE SupplierCode = ?";
-  db.query(sql, [SupplierCode], (err, results) => {
+    "SELECT * FROM suppliers WHERE SupplierCode = ? AND master_id = ? AND visibility = 1";
+
+  db.query(sql, [SupplierCode, master_id], (err, results) => {
     if (err) {
       console.error("Database Error:", err);
       return res
@@ -100,8 +106,8 @@ exports.getSupplierById = (req, res) => {
     if (results.length === 0) {
       return res.status(404).json({ error: "Supplier not found" });
     }
+
     const supplier = results[0];
-    // res.status(200).json(supplier);
     res.status(200).json({
       message: "Supplier details retrieved successfully",
       supplier: supplier,
@@ -124,6 +130,7 @@ exports.updateSupplier = (req, res) => {
     visibility,
     updated_timestamp,
     updated_by,
+    master_id,
   } = req.body;
   console.log("SupplierCode received:", SupplierCode);
   console.log("Supplier Description received:", SupplierDescription);
@@ -138,7 +145,8 @@ exports.updateSupplier = (req, res) => {
 
   const sql = `
       UPDATE suppliers 
-      SET SupplierDescription = ?, SupplierAddress = ? ,visibility = ? ,updated_timestamp =?,updated_by=?
+      SET SupplierDescription = ?, SupplierAddress = ? ,visibility = ? ,updated_timestamp =?,updated_by=?,
+      master_id = ? 
       WHERE SupplierCode = ?
     `;
 
@@ -148,6 +156,7 @@ exports.updateSupplier = (req, res) => {
     visibility !== undefined ? visibility : 1,
     updated_timestamp ? updated_timestamp.trim() : null,
     updated_by ? updated_by.trim() : null,
+    master_id.trim(),
     SupplierCode,
   ];
 
@@ -201,13 +210,24 @@ exports.deleteSupplier = (req, res) => {
 
 // Get all Supplier
 exports.getAllSupplier = (req, res) => {
-  const sql = "SELECT * FROM suppliers WHERE visibility = 1";
+  const { master_id } = req.body;
 
-  db.query(sql, (err, results) => {
+  if (!master_id) {
+    return res.status(400).json({ error: "master_id is required" });
+  }
+
+  const sql = "SELECT * FROM suppliers WHERE master_id = ? AND visibility = 1";
+
+  db.query(sql, [master_id], (err, results) => {
     if (err) {
       console.error("Database Error:", err);
-      return res.status(500).json({ error: "Failed to retrieve products" });
+      return res.status(500).json({ error: "Failed to retrieve suppliers" });
     }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Supplier not found" });
+    }
+
     res.status(200).json(results);
   });
 };

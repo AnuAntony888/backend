@@ -8,5 +8,5 @@ router.post('/getcategorybyid', authenticateToken, categoryController.getCategor
 router.post('/checkcategory', authenticateToken, categoryController.checkCategory);
 router.post('/deletecategory', authenticateToken, categoryController.deleteCategory);
 router.put('/updatecategory', authenticateToken, categoryController.updateCategory);
-router.get('/getAllcategory',authenticateToken, categoryController.getAllCategory);
+router.post('/getAllcategory',authenticateToken, categoryController.getAllCategory);
 module.exports = router;

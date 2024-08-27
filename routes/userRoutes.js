@@ -12,5 +12,6 @@ router.post('/getuserbyemail', authenticateToken, userController.getUserByEmail)
 router.put('/updateuser', authenticateToken, userController.updateUser); // Use userController
 router.post('/deleteuser', authenticateToken, userController.deleteuser);
 router.get('/getallemployee', authenticateToken, userController.getAllVisibleEmployees); 
+router.post('/generate-employee-number', userController.generateemployeeNumber);
 module.exports = router;
 

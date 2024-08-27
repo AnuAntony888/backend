@@ -11,6 +11,8 @@ const JWT_EXPIRATION = process.env.JWT_EXPIRATION || "360d";
 let tokenBlacklist = []; // In-memory blacklist, use a persistent store in production
 
 
+
+
 exports.signup = async (req, res) => {
   const {
     name,
@@ -49,11 +51,23 @@ exports.signup = async (req, res) => {
       }
 
       if (results.length > 0) {
-        // Email exists, update the record
+        // Email exists, check if the details are the same
         const user = results[0];
 
-        // If the visibility is different or other details are to be updated
-        if (visibility !== user.visibility) {
+        if (
+          name === user.name &&
+          employeeno === user.employeeno &&
+          employeecategory === user.employeecategory &&
+          employeestatus === user.employeestatus &&
+          master_id === user.master_id &&
+          visibility === user.visibility
+        ) {
+          // All details are the same, return an error
+          return res.status(400).json({
+            error: "User already exists with the same details.",
+          });
+        } else {
+          // Details are different, update the record
           const updateSql = `
             UPDATE users
             SET
@@ -84,19 +98,14 @@ exports.signup = async (req, res) => {
             (err, results) => {
               if (err) {
                 console.error("Error updating user:", err);
-                return res
-                  .status(500)
-                  .json({
-                    error: "An error occurred while updating the user.",
-                  });
+                return res.status(500).json({
+                  error: "An error occurred while updating the user.",
+                });
               }
 
               res.json({ message: "User details updated successfully" });
             }
           );
-        } else {
-          // No changes needed if visibility and other details are the same
-          res.json({ message: "User already exists with the same details" });
         }
       } else {
         // Email does not exist, create a new user
@@ -106,7 +115,7 @@ exports.signup = async (req, res) => {
           const user_id = uuidv4();
 
           db.query(
-            "INSERT INTO users (user_id, name, email, password, employeeno, employeecategory, employeestatus,  master_id, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)",
+            "INSERT INTO users (user_id, name, email, password, employeeno, employeecategory, employeestatus, master_id, visibility) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [
               user_id,
               name,
@@ -146,6 +155,7 @@ exports.signup = async (req, res) => {
     }
   );
 };
+
 exports.getAllUsers = (req, res) => {
   db.query("SELECT name, email, password FROM users", (err, results) => {
     if (err) {
@@ -172,7 +182,9 @@ exports.getAllUsers = (req, res) => {
     res.json(users);
   });
 };
-
+{
+  /********************************Login*********************************************/
+}
 exports.login = (req, res) => {
   const { email, password } = req.body;
 
@@ -207,14 +219,32 @@ exports.login = (req, res) => {
 
           console.log("Generated token:", token); // Debugging log
 
-          res.json({
-            message: "Login successful",
-            token: token,
-            userId: user.user_id, // Added userId
-            email: user.email, // Added email
-            name: user.name, // Added name (ensure `name` exists in the database)
-            employeestatus: user.employeestatus,
-          });
+          // Get entity name from mastertable
+
+          const sql = "SELECT * FROM masterTabele WHERE master_id = ?";
+    
+  db.query(sql, [user.master_id], (err, results) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to retrieve entityName details" });
+    }
+    console.log("Query Results:", results);
+    if (results.length === 0) {
+      return res.status(404).json({ error: "master not found" });
+    }
+    const entityName = results[0];
+     
+              res.json({
+                message: "Login successful",
+                token: token,
+                userId: user.user_id,
+                email: user.email,
+                name: user.name,
+                employeestatus: user.employeestatus,
+                master: entityName,
+              });
+            }
+          );
         } else {
           res.status(401).json({ error: "Invalid credentials" });
         }
@@ -225,7 +255,7 @@ exports.login = (req, res) => {
     }
   );
 };
-
+/***************************logout****************************************/
 exports.logout = (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (token) {
@@ -347,7 +377,7 @@ exports.getAllVisibleEmployees = (req, res) => {
     FROM users
     WHERE visibility = 1 AND employeestatus = 'employee'
   `;
-  
+
   db.query(query, (err, results) => {
     if (err) {
       console.error("Error fetching employee details:", err);
@@ -356,7 +386,9 @@ exports.getAllVisibleEmployees = (req, res) => {
         .json({ error: "An error occurred while fetching employee details." });
     }
     if (results.length === 0) {
-      return res.status(404).json({ error: "No visible employees found with status 'employee'" });
+      return res
+        .status(404)
+        .json({ error: "No visible employees found with status 'employee'" });
     }
     // Return employee details
     res.status(200).json(results);
@@ -379,10 +411,10 @@ exports.generateemployeeNumber = async (req, res) => {
     const lastemployeeeNumber = await new Promise((resolve, reject) => {
       db.query(lastemployeeSql, [`EMP-${datePart}%`], (err, result) => {
         if (err) {
-          console.error("Error fetching last invoice number:", err);
+          console.error("Error fetching last employee number:", err);
           reject(err);
         } else {
-          resolve(result.length > 0 ? result[0].invoice_no : null);
+          resolve(result.length > 0 ? result[0].employeeno : null);
         }
       });
     });
@@ -391,12 +423,15 @@ exports.generateemployeeNumber = async (req, res) => {
 
     if (lastemployeeeNumber) {
       // Extract the sequential part from the last invoice number
-      const lastSequentialPart = parseInt(lastemployeeeNumber.split("-")[2], 10);
+      const lastSequentialPart = parseInt(
+        lastemployeeeNumber.split("-")[2],
+        10
+      );
       sequentialPart = lastSequentialPart + 1;
     }
 
     const sequentialPartStr = String(sequentialPart).padStart(4, "0");
-    const newEmployeeNumber = `INV-${datePart}-${sequentialPartStr}`;
+    const newEmployeeNumber = `EMP-${datePart}-${sequentialPartStr}`;
 
     // Send the generated invoice number as a response
     res.status(200).json({ EmployeeNumber: newEmployeeNumber });
@@ -404,4 +439,3 @@ exports.generateemployeeNumber = async (req, res) => {
     res.status(500).json({ error: "Failed to generate invoice number" });
   }
 };
-

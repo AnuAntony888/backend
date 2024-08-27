@@ -12,6 +12,7 @@ exports.createcategory = async (req, res) => {
       visibility: 1, // Set visibility to 1 for newly created category
       created_timestamp: req.body.created_timestamp.trim(), // Add created_timestamp
       created_by: req.body.created_by.trim(), // Add created_by
+      master_id: req.body.master_id.trim(),
     };
 
     // Get the maximum CategoryCode from the database
@@ -39,8 +40,8 @@ exports.createcategory = async (req, res) => {
     // Insert the new category into the database
     const sql = `
       INSERT INTO category (category_id, CategoryCode, CategoryDescription, visibility,
-      created_timestamp, created_by)
-      VALUES (?, ?, ?, ?,?,?)
+      created_timestamp, created_by,master_id)
+      VALUES (?, ?, ?, ?,?,?,?)
     `;
 
     const values = [
@@ -49,8 +50,8 @@ exports.createcategory = async (req, res) => {
       category.CategoryDescription,
       category.visibility,
       category.created_timestamp,
-      category.created_by
-
+      category.created_by,
+      category.master_id
     ];
 
     console.log("Executing SQL:", sql, "with values:", values); // Log SQL execution
@@ -83,17 +84,17 @@ exports.createcategory = async (req, res) => {
 exports.getCategoryById = (req, res) => {
   console.log("Request Body:", req.body);
 
-  const { CategoryCode } = req.body;
+  const { CategoryCode , master_id} = req.body;
 
   console.log("CategoryCode received:", CategoryCode);
 
-  if (!CategoryCode) {
-    return res.status(400).json({ error: "CategoryCode is required" });
+  if (!CategoryCode || !master_id) {
+    return res.status(400).json({ error: "CategoryCode and master_id is required" });
   }
   const sql =
-    "SELECT * FROM category WHERE CategoryCode = ? AND visibility = 1";
+    "SELECT * FROM category WHERE CategoryCode = ? AND master_id = ? AND visibility = 1";
 
-  db.query(sql, [CategoryCode], (err, results) => {
+  db.query(sql, [CategoryCode,master_id ] ,(err, results) => {
     if (err) {
       console.error("Database Error:", err);
       return res
@@ -190,6 +191,7 @@ exports.updateCategory = (req, res) => {
   const { CategoryCode, CategoryDescription, visibility,
     updated_timestamp,
     updated_by,
+    master_id,
   } = req.body;
   console.log("CategoryCode received:", CategoryCode);
   console.log("CategoryDescription received:", CategoryDescription);
@@ -205,7 +207,7 @@ exports.updateCategory = (req, res) => {
   const sql = `
     UPDATE category 
     SET CategoryDescription = ?, visibility = ?  ,   updated_timestamp=?,
-    updated_by =?
+    updated_by =? ,master_id = ?
     WHERE CategoryCode = ?
   `;
 
@@ -215,6 +217,7 @@ exports.updateCategory = (req, res) => {
     visibility !== undefined ? visibility : 1,
     updated_timestamp ? updated_timestamp.trim() : null,
     updated_by ? updated_by.trim() : null,
+    master_id ? master_id.trim() : null,
     CategoryCode
   ];
 
@@ -238,9 +241,14 @@ exports.updateCategory = (req, res) => {
 //get all category
 
 exports.getAllCategory = (req, res) => {
-  const sql = "SELECT * FROM category  WHERE visibility = 1";
+  const { master_id } = req.body;
 
-  db.query(sql, (err, results) => {
+  if (!master_id) {
+    return res.status(400).json({ error: "master_id is required" });
+  }
+  const sql = "SELECT * FROM category  WHERE master_id = ? AND visibility = 1";
+
+  db.query(sql,[master_id], (err, results) => {
     if (err) {
       console.error("Database Error:", err);
       return res.status(500).json({ error: "Failed to retrieve products" });

@@ -11,11 +11,22 @@ const createTables = () => {
       images TEXT NOT NULL
     );
   `;
-
+  const createMasterTable = `
+  CREATE TABLE IF NOT EXISTS masterTabele (
+   master_id VARCHAR(255) PRIMARY KEY,
+    entityName VARCHAR(255) NOT NULL,
+      entityAddress VARCHAR(255) NOT NULL  ,
+  tax VARCHAR(255) NOT NULL,
+   discount VARCHAR(255) NOT NULL,
+    itemTax VARCHAR(255) NOT NULL,
+    itemDiscount VARCHAR(255) NOT NULL,
+  visibility TINYINT DEFAULT 1
+  );
+  `;
   const createUsersTable = `
     CREATE TABLE IF NOT EXISTS users (
       user_id VARCHAR(255) PRIMARY KEY,
-      name VARCHAR(255) NOT NULL UNIQUE,
+      name VARCHAR(255) NOT NULL ,
       employeeno VARCHAR(255) NOT NULL,
       employeecategory VARCHAR(255) NOT NULL,
       employeestatus VARCHAR(255) NOT NULL,
@@ -26,12 +37,10 @@ const createTables = () => {
       FOREIGN KEY (master_id) REFERENCES masterTabele(master_id)
     );
   `;
-//   const addusersTabeleColumn = `
-// ALTER TABLE users 
-// ADD master_id VARCHAR(255) NOT NULL,
-//     FOREIGN KEY (master_id) REFERENCES masterTabel(master_id);
 
-// `;
+  
+
+
   const createSuppliersTable = `
     CREATE TABLE IF NOT EXISTS suppliers (
       user_id VARCHAR(255) PRIMARY KEY,
@@ -44,10 +53,18 @@ const createTables = () => {
       updated_timestamp VARCHAR(255) NOT NULL,
       updated_by VARCHAR(255) NOT NULL,
       deleted_timestamp VARCHAR(255) NOT NULL,
-      deleted_by VARCHAR(255) NOT NULL
+      deleted_by VARCHAR(255) NOT NULL,
+      master_id VARCHAR(255),
+    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id);
+     
         );
     
   `;
+  // const addUsersTableColumn = `
+  //   ALTER TABLE Invoice
+  //   ADD master_id VARCHAR(255),
+  //   ADD FOREIGN KEY (master_id) REFERENCES masterTabele(master_id);
+  // `;
 
   const createcategoryTable = `
 
@@ -61,7 +78,9 @@ const createTables = () => {
       updated_timestamp VARCHAR(255) NOT NULL,
       updated_by VARCHAR(255) NOT NULL,
       deleted_timestamp VARCHAR(255) NOT NULL,
-      deleted_by VARCHAR(255) NOT NULL
+      deleted_by VARCHAR(255) NOT NULL,
+        master_id VARCHAR(255),
+    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id);
         );
     
   `;
@@ -85,6 +104,8 @@ const createTables = () => {
       updated_by VARCHAR(255) NOT NULL,
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
+        master_id VARCHAR(255),
+    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id),
     FOREIGN KEY (ItemSupplier) REFERENCES suppliers(user_id),
     FOREIGN KEY (ItemCategory) REFERENCES category(category_id)
    
@@ -100,7 +121,9 @@ customerContactNo VARCHAR(255) NOT NULL,
  customerTownCity VARCHAR(255) NOT NULL,
   customerPin VARCHAR(255) NOT NULL,
  customerGSTN VARCHAR(255) NOT NULL,
-customerAddress VARCHAR(255) NOT NULL  
+customerAddress VARCHAR(255) NOT NULL  ,
+  master_id VARCHAR(255),
+    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id);
 );
 `;
 
@@ -124,24 +147,15 @@ customerAddress VARCHAR(255) NOT NULL
       updated_by VARCHAR(255) NOT NULL,
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
+        master_id VARCHAR(255),
+    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id),
     FOREIGN KEY (customer_id) REFERENCES customerTabele(customer_id),
     FOREIGN KEY (product_id) REFERENCES iteamTabele(product_id),
     FOREIGN KEY (employee_id) REFERENCES users(user_id)
   );
   `;
 
-  const createMasterTable = `
-  CREATE TABLE IF NOT EXISTS masterTabele (
-   master_id VARCHAR(255) PRIMARY KEY,
-    entityName VARCHAR(255) NOT NULL,
-      entityAddress VARCHAR(255) NOT NULL  ,
-  tax VARCHAR(255) NOT NULL,
-   discount VARCHAR(255) NOT NULL,
-    itemTax VARCHAR(255) NOT NULL,
-    itemDiscount VARCHAR(255) NOT NULL,
-  visibility TINYINT DEFAULT 1
-  );
-  `;
+  
 
   // Function to run the queries
   const runQuery = (query, successMessage, errorMessage, callback) => {
@@ -190,7 +204,7 @@ customerAddress VARCHAR(255) NOT NULL
       runQuery(createMasterTable, "create MasterTable");
       //  runQuery(addVisibilityColumn, "alter suppliertabel");
       // runQuery(additeamTabeleColumn, "alter suppliertabel");
-      //  runQuery(addusersTabeleColumn, "usermastervisiblity");
+        runQuery(addUsersTableColumn, "usermastervisiblity");
     }
   );
 };
