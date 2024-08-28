@@ -55,16 +55,10 @@ const createTables = () => {
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
       master_id VARCHAR(255),
-    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id);
-     
-        );
-    
+       FOREIGN KEY (master_id) REFERENCES masterTabele(master_id) 
+        );    
   `;
-  // const addUsersTableColumn = `
-  //   ALTER TABLE Invoice
-  //   ADD master_id VARCHAR(255),
-  //   ADD FOREIGN KEY (master_id) REFERENCES masterTabele(master_id);
-  // `;
+
 
   const createcategoryTable = `
 
@@ -80,7 +74,7 @@ const createTables = () => {
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
         master_id VARCHAR(255),
-    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id);
+    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id)
         );
     
   `;
@@ -107,8 +101,7 @@ const createTables = () => {
         master_id VARCHAR(255),
     FOREIGN KEY (master_id) REFERENCES masterTabele(master_id),
     FOREIGN KEY (ItemSupplier) REFERENCES suppliers(user_id),
-    FOREIGN KEY (ItemCategory) REFERENCES category(category_id)
-   
+    FOREIGN KEY (ItemCategory) REFERENCES category(category_id)   
   );
 `;
   // user_id VARCHAR(255),
@@ -123,10 +116,15 @@ customerContactNo VARCHAR(255) NOT NULL,
  customerGSTN VARCHAR(255) NOT NULL,
 customerAddress VARCHAR(255) NOT NULL  ,
   master_id VARCHAR(255),
-    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id);
+  visibility TINYINT DEFAULT 1,
+    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id)
 );
 `;
-
+  // const addUsersTableColumn = `
+  //   ALTER TABLE Invoice
+  //   ADD  visibility TINYINT DEFAULT 1,
+    
+  // `;
   const createInvoiceTable = `
   CREATE TABLE IF NOT EXISTS Invoice (
     invoice_id VARCHAR(255) PRIMARY KEY,
@@ -148,6 +146,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
         master_id VARCHAR(255),
+        visibility TINYINT DEFAULT 1,
     FOREIGN KEY (master_id) REFERENCES masterTabele(master_id),
     FOREIGN KEY (customer_id) REFERENCES customerTabele(customer_id),
     FOREIGN KEY (product_id) REFERENCES iteamTabele(product_id),
@@ -204,7 +203,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
       runQuery(createMasterTable, "create MasterTable");
       //  runQuery(addVisibilityColumn, "alter suppliertabel");
       // runQuery(additeamTabeleColumn, "alter suppliertabel");
-        runQuery(addUsersTableColumn, "usermastervisiblity");
+        //  runQuery(addUsersTableColumn, "usermastervisiblity");
     }
   );
 };

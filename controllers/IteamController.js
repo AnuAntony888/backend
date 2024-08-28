@@ -16,6 +16,7 @@ exports.createIteame = async (req, res) => {
       visibility = 1, // Default visibility to 1
       created_timestamp,
       created_by,
+      master_id,
     } = req.body;
 
     console.log("Received request body:", req.body);
@@ -29,8 +30,7 @@ exports.createIteame = async (req, res) => {
       !ItemTax ||
       !IteamDiscount ||
       !IteamPrice ||
-      !Iteamstock 
-   
+      !Iteamstock
     ) {
       return res
         .status(400)
@@ -100,9 +100,10 @@ exports.createIteame = async (req, res) => {
             Iteamstock,
             visibility,
          created_timestamp,
-      created_by
+      created_by,
+        master_id
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
         `;
             const insertValues = [
               uuidv4(),
@@ -118,6 +119,7 @@ exports.createIteame = async (req, res) => {
               visibility,
               created_timestamp,
               created_by,
+              master_id,
             ];
 
             db.query(insertSql, insertValues, (err, result) => {
@@ -152,17 +154,19 @@ exports.getItemByItemcode = (req, res) => {
   console.log("Request Body:", req.body);
 
   // Extract the ItemCode from the JSON body
-  const { ItemCode } = req.body;
+  const { ItemCode, master_id } = req.body;
   console.log("ItemCode received:", ItemCode);
 
-  if (!ItemCode) {
-    return res.status(400).json({ error: "ItemCode is required" });
+  if (!ItemCode || !master_id) {
+    return res
+      .status(400)
+      .json({ error: "ItemCode and  master_id is required " });
   }
 
   // Query to get item details
   const getItemSql =
-    "SELECT * FROM iteamtabele WHERE ItemCode = ? AND visibility = 1";
-  db.query(getItemSql, [ItemCode], (err, itemResults) => {
+    "SELECT * FROM iteamtabele WHERE ItemCode = ? AND  master_id AND visibility = 1";
+  db.query(getItemSql, [ItemCode, master_id], (err, itemResults) => {
     if (err) {
       console.error("Database Error:", err);
       return res.status(500).json({ error: "Failed to retrieve product" });
@@ -240,6 +244,7 @@ exports.updateItem = (req, res) => {
     visibility,
     updated_timestamp,
     updated_by,
+    master_id,
   } = req.body;
 
   // Validate required fields for updating
@@ -281,7 +286,8 @@ exports.updateItem = (req, res) => {
           Iteamstock = ?,
           visibility = ?,
           updated_timestamp = ?,
-          updated_by = ? 
+          updated_by = ?,
+          master_id = ?          
         WHERE ItemCode = ?
       `;
       const updateValues = [
@@ -294,6 +300,7 @@ exports.updateItem = (req, res) => {
         visibility !== undefined ? visibility : 1,
         updated_timestamp ? updated_timestamp : null,
         updated_by ? updated_by : null,
+        master_id,
         ItemCode,
       ];
 
@@ -335,27 +342,23 @@ exports.deleteItem = (req, res) => {
       console.error("Database Error:", err);
       return res
         .status(500)
-        .json({ error: "Failed to update Item visibility" });
+        .json({ error: "Failed to Delete Item " });
     }
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Item not found" });
     }
 
-    res.status(200).json({ message: "Item visibility updated to hidden" });
+    res.status(200).json({ message: "Item Delete sucessfully" });
   });
 };
 
-
-
-
-
 // Function to get items by supplier name
 
-
-
 exports.getAllItems = (req, res) => {
-  const { SupplierDescription } = req.body;
+  const { SupplierDescription,
+    master_id
+  } = req.body;
 
   // Helper function to fetch and map data
   const fetchAndMapData = (items) => {
@@ -364,7 +367,8 @@ exports.getAllItems = (req, res) => {
     const categoryIds = [...new Set(items.map((item) => item.ItemCategory))];
 
     // Query to get supplier descriptions
-    const getSupplierSql = "SELECT user_id, SupplierDescription FROM suppliers WHERE user_id IN (?)";
+    const getSupplierSql =
+      "SELECT user_id, SupplierDescription FROM suppliers WHERE user_id IN (?)";
     db.query(getSupplierSql, [supplierIds], (err, supplierResults) => {
       if (err) {
         console.error("Database Error:", err);
@@ -378,11 +382,14 @@ exports.getAllItems = (req, res) => {
       });
 
       // Query to get category descriptions
-      const getCategorySql = "SELECT category_id, CategoryDescription FROM category WHERE category_id IN (?)";
+      const getCategorySql =
+        "SELECT category_id, CategoryDescription FROM category WHERE category_id IN (?)";
       db.query(getCategorySql, [categoryIds], (err, categoryResults) => {
         if (err) {
           console.error("Database Error:", err);
-          return res.status(500).json({ error: "Failed to retrieve categories" });
+          return res
+            .status(500)
+            .json({ error: "Failed to retrieve categories" });
         }
 
         // Create a mapping of category IDs to descriptions
@@ -406,11 +413,14 @@ exports.getAllItems = (req, res) => {
 
   if (SupplierDescription) {
     // Step 1: Get supplier ID from the suppliers table
-    const getSupplierIdSql = "SELECT user_id FROM suppliers WHERE SupplierDescription = ?";
+    const getSupplierIdSql =
+      "SELECT user_id FROM suppliers WHERE SupplierDescription = ?";
     db.query(getSupplierIdSql, [SupplierDescription], (err, supplierRows) => {
       if (err) {
         console.error("Database Error while fetching supplier ID:", err);
-        return res.status(500).json({ error: "Failed to retrieve supplier ID" });
+        return res
+          .status(500)
+          .json({ error: "Failed to retrieve supplier ID" });
       }
 
       if (supplierRows.length === 0) {
@@ -420,15 +430,18 @@ exports.getAllItems = (req, res) => {
       const supplierID = supplierRows[0].user_id;
 
       // Step 2: Get items by supplier ID
-      const getItemsSql = "SELECT * FROM iteamTabele WHERE ItemSupplier = ? AND visibility = 1";
-      db.query(getItemsSql, [supplierID], (err, itemResults) => {
+      const getItemsSql =
+        "SELECT * FROM iteamTabele WHERE ItemSupplier = ? AND master_id = ? AND visibility = 1";
+      db.query(getItemsSql, [supplierID,master_id], (err, itemResults) => {
         if (err) {
           console.error("Database Error while fetching items:", err);
           return res.status(500).json({ error: "Failed to retrieve items" });
         }
 
         if (itemResults.length === 0) {
-          return res.status(404).json({ error: "No items found for this supplier" });
+          return res
+            .status(404)
+            .json({ error: "No items found for this supplier" });
         }
 
         fetchAndMapData(itemResults);
@@ -436,8 +449,8 @@ exports.getAllItems = (req, res) => {
     });
   } else {
     // Step 1: Get all items where visibility is 1
-    const getItemSql = "SELECT * FROM iteamtabele WHERE visibility = 1";
-    db.query(getItemSql, (err, itemResults) => {
+    const getItemSql = "SELECT * FROM iteamtabele WHERE master_id = ? AND visibility = 1";
+    db.query(getItemSql,[master_id], (err, itemResults) => {
       if (err) {
         console.error("Database Error:", err);
         return res.status(500).json({ error: "Failed to retrieve items" });
