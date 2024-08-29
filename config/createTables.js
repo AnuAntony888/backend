@@ -13,16 +13,16 @@ const createTables = () => {
   `;
   const createMasterTable = `
   CREATE TABLE IF NOT EXISTS masterTabele (
-   master_id VARCHAR(255) PRIMARY KEY,
+    master_id VARCHAR(255) PRIMARY KEY,
     entityName VARCHAR(255) NOT NULL,
-      entityAddress VARCHAR(255) NOT NULL  ,
-  tax VARCHAR(255) NOT NULL,
-   discount VARCHAR(255) NOT NULL,
-    itemTax VARCHAR(255) NOT NULL,
-    itemDiscount VARCHAR(255) NOT NULL,
-  visibility TINYINT DEFAULT 1
+    entityAddress VARCHAR(255) NOT NULL,
+    tax VARCHAR(255) NOT NULL,
+    discount VARCHAR(255) NOT NULL,
+    itemTax TINYINT NOT NULL,
+    itemDiscount TINYINT NOT NULL,
+    visibility TINYINT DEFAULT 1
   );
-  `;
+`;
   const createUsersTable = `
     CREATE TABLE IF NOT EXISTS users (
       user_id VARCHAR(255) PRIMARY KEY,
@@ -55,7 +55,7 @@ const createTables = () => {
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
       master_id VARCHAR(255),
-       FOREIGN KEY (master_id) REFERENCES masterTabele(master_id) 
+      FOREIGN KEY (master_id) REFERENCES masterTabele(master_id) 
         );    
   `;
 
@@ -174,6 +174,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
     "Products table created or already exists.",
     "Error creating products table."
   );
+  runQuery(createMasterTable, "create MasterTable");
   runQuery(
     createSuppliersTable,
     "Suppliers table created or already exists.",
@@ -200,7 +201,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
         "Error creating invoice table."
       );
       runQuery(createcategoryTable, "create category");
-      runQuery(createMasterTable, "create MasterTable");
+
       //  runQuery(addVisibilityColumn, "alter suppliertabel");
       // runQuery(additeamTabeleColumn, "alter suppliertabel");
         //  runQuery(addUsersTableColumn, "usermastervisiblity");
