@@ -1,12 +1,18 @@
 const mysql = require("mysql");
 
+// const dbConfig = {
+//   host: 'localhost',
+//   user: 'root',
+//   password: 'kzLVN9bMAX/!Ym1h',
+//   database: 'mydatabase'
+// };
+
 const dbConfig = {
   host: 'localhost',
-  user: 'root',
-  password: 'kzLVN9bMAX/!Ym1h',
-  database: 'mydatabase'
-};
-
+  user: 'vedahtee_smartbilling',
+  password: 'Admin#2018@',
+  database: 'vedahtee_smartbilling',
+}
 let connection;
 
 function handleDisconnect() {
