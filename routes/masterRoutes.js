@@ -5,7 +5,7 @@ const authenticateToken = require('../middleware/authenticateToken');
 
 router.post('/createmaster', authenticateToken, masterController.createmaster);
 router.post('/getmasterbyname', authenticateToken, masterController.getmasterByname);
-router.get('/getAllMaster', authenticateToken, masterController.getAllMaster);
+router.get('/getAllMaster',  masterController.getAllMaster);
 console.log(authenticateToken, "authenticateToken");
 module.exports = router;
 

@@ -156,14 +156,33 @@ const sql = "SELECT * FROM masterTabele WHERE entityName = ? AND visibility = 1"
 };
 
 // Get all Supplier
-exports.getAllMaster = (req, res) => {
+// exports.getAllMaster = (req, res) => {
+//   const sql = "SELECT * FROM masterTabele WHERE visibility = 1";
+
+//   db.query(sql, (err, results) => {
+//     if (err) {
+//       console.error("Database Error:", err);
+//       return res.status(500).json({ error: "Failed to retrieve products" });
+//     }
+//     res.status(200).json(results);
+//   });
+// };
+exports.getAllMaster = async (req, res) => {
   const sql = "SELECT * FROM masterTabele WHERE visibility = 1";
 
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error("Database Error:", err);
-      return res.status(500).json({ error: "Failed to retrieve products" });
-    }
+  try {
+    const results = await new Promise((resolve, reject) => {
+      db.query(sql, (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(results);
+      });
+    });
+
     res.status(200).json(results);
-  });
+  } catch (err) {
+    console.error("Database Error:", err);
+    res.status(500).json({ error: "Failed to retrieve products" });
+  }
 };
