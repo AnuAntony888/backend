@@ -56,15 +56,20 @@
 //   }
 // };
 
-const mysql = require("mysql");
-
+ const mysql = require("mysql");
+// const mysql = require('mysql2');
 const dbConfig = {
-  host: "127.0.0.1",
-  port: 3306,
+  host: "localhost",
   user: "vedahtee_smartbilling",
   password: "Admin#2018@",
   database: "vedahtee_smartbilling",
 };
+// const dbConfig = {
+//   host: 'localhost',
+//   user: 'root',
+//   password: 'kzLVN9bMAX/!Ym1h',
+//   database: 'mydatabase'
+// };
 
 let connection;
 
