@@ -34,6 +34,9 @@ app.use("/api/category", categoryRoutes);
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });
+app.get("/api/master", (req, res) => {
+  res.json({ message: "Welcome to the API!" });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
