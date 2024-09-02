@@ -52,7 +52,7 @@ exports.createinvoice = async (req, res) => {
     }
 
     // Check if invoice_no already exists
-    const checkInvoiceSql = `SELECT * FROM Invoice WHERE invoice_no = ?`;
+    const checkInvoiceSql = `SELECT * FROM invoice WHERE invoice_no = ?`;
     const existingInvoice = await new Promise((resolve, reject) => {
       db.query(checkInvoiceSql, [invoice_no], (err, result) => {
         if (err) {
@@ -63,11 +63,11 @@ exports.createinvoice = async (req, res) => {
         }
       });
     });
-    console.log(existingInvoice.length, "leng");
-    if (existingInvoice.length > 0) {
+    console.log(existinginvoice.length, "leng");
+    if (existinginvoice.length > 0) {
       // Invoice exists, update the records
       const updateSql = `
-        UPDATE Invoice SET
+        UPDATE invoice SET
           invoice_date = ?,
           customer_id = ?,
           product_id = ?, 
@@ -123,7 +123,7 @@ exports.createinvoice = async (req, res) => {
     } else {
       // Invoice does not exist, insert new records
       const insertSql = `
-        INSERT INTO Invoice (
+        INSERT INTO invoice (
           invoice_id,
           invoice_no,
           invoice_date,
@@ -194,11 +194,11 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
     if (!invoice_no || !master_id) {
       return res
         .status(400)
-        .json({ error: "Invoice number and master_id is required" });
+        .json({ error: "invoice number and master_id is required" });
     }
 
     // const invoiceSql = `SELECT * FROM Invoice WHERE master_id = ? AND invoice_no = ?`;
-    const invoiceSql = `SELECT * FROM Invoice WHERE master_id = ? AND invoice_no = ? AND visibility= 1`;
+    const invoiceSql = `SELECT * FROM invoice WHERE master_id = ? AND invoice_no = ? AND visibility= 1`;
     const invoiceDetails = await new Promise((resolve, reject) => {
       db.query(invoiceSql, [master_id, invoice_no], (err, result) => {
         if (err) {
@@ -302,7 +302,7 @@ exports.generateInvoiceNumber = async (req, res) => {
     const datePart = `${year}${month}${day}`;
 
     // Query to find the last invoice number for the given date
-    const lastInvoiceSql = `SELECT invoice_no FROM Invoice WHERE invoice_no LIKE ? ORDER BY invoice_no DESC LIMIT 1`;
+    const lastInvoiceSql = `SELECT invoice_no FROM invoice WHERE invoice_no LIKE ? ORDER BY invoice_no DESC LIMIT 1`;
     const lastInvoiceNumber = await new Promise((resolve, reject) => {
       db.query(lastInvoiceSql, [`INV-${datePart}%`], (err, result) => {
         if (err) {
@@ -355,7 +355,7 @@ exports.deleteInvoice = async (req, res) => {
 
     // Update visibility of the invoice to 0 (hidden)
     const updateVisibilitySql = `
-      UPDATE Invoice
+      UPDATE invoice
       SET visibility = ?, deleted_timestamp = ?, deleted_by = ?, orderstatus = ?
       WHERE invoice_no = ?
     `;

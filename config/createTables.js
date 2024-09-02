@@ -12,7 +12,7 @@ const createTables = () => {
     );
   `;
   const createMasterTable = `
-  CREATE TABLE IF NOT EXISTS masterTabele (
+  CREATE TABLE IF NOT EXISTS mastertabele (
     master_id VARCHAR(255) PRIMARY KEY,
     entityName VARCHAR(255) NOT NULL,
     entityAddress VARCHAR(255) NOT NULL,
@@ -34,7 +34,7 @@ const createTables = () => {
       password VARCHAR(255) NOT NULL,
       master_id VARCHAR(255),
       visibility TINYINT DEFAULT 1,
-      FOREIGN KEY (master_id) REFERENCES masterTabele(master_id)
+      FOREIGN KEY (master_id) REFERENCES mastertabele(master_id)
     );
   `;
 
@@ -55,7 +55,7 @@ const createTables = () => {
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
       master_id VARCHAR(255),
-      FOREIGN KEY (master_id) REFERENCES masterTabele(master_id) 
+      FOREIGN KEY (master_id) REFERENCES mastertabele(master_id) 
         );    
   `;
 
@@ -74,7 +74,7 @@ const createTables = () => {
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
         master_id VARCHAR(255),
-    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id)
+    FOREIGN KEY (master_id) REFERENCES mastertabele(master_id)
         );
     
   `;
@@ -99,7 +99,7 @@ const createTables = () => {
       deleted_timestamp VARCHAR(255) NOT NULL,
       deleted_by VARCHAR(255) NOT NULL,
         master_id VARCHAR(255),
-    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id),
+    FOREIGN KEY (master_id) REFERENCES mastertabele(master_id),
     FOREIGN KEY (ItemSupplier) REFERENCES suppliers(user_id),
     FOREIGN KEY (ItemCategory) REFERENCES category(category_id)   
   );
@@ -117,7 +117,7 @@ customerContactNo VARCHAR(255) NOT NULL,
 customerAddress VARCHAR(255) NOT NULL  ,
   master_id VARCHAR(255),
   visibility TINYINT DEFAULT 1,
-    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id)
+    FOREIGN KEY (master_id) REFERENCES mastertabele(master_id)
 );
 `;
   // const addUsersTableColumn = `
@@ -147,7 +147,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
       deleted_by VARCHAR(255) NOT NULL,
         master_id VARCHAR(255),
         visibility TINYINT DEFAULT 1,
-    FOREIGN KEY (master_id) REFERENCES masterTabele(master_id),
+    FOREIGN KEY (master_id) REFERENCES mastertabele(master_id),
     FOREIGN KEY (customer_id) REFERENCES customerTabele(customer_id),
     FOREIGN KEY (product_id) REFERENCES iteamTabele(product_id),
     FOREIGN KEY (employee_id) REFERENCES users(user_id)

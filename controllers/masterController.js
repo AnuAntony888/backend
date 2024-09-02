@@ -27,7 +27,7 @@ exports.createmaster = async (req, res) => {
     }
 
     // Check if entityName already exists
-    const checkMasterSql = `SELECT * FROM masterTabele WHERE entityName = ?`;
+    const checkMasterSql = `SELECT * FROM mastertabele WHERE entityName = ?`;
     const existingMaster = await new Promise((resolve, reject) => {
       db.query(checkMasterSql, [entityName], (err, result) => {
         if (err) {
@@ -42,7 +42,7 @@ exports.createmaster = async (req, res) => {
     if (existingMaster.length > 0) {
       // Record exists, update the record
       const updateSql = `
-        UPDATE masterTabele SET
+        UPDATE mastertabele SET
         entityName = ?,
         entityAddress = ?,
         tax = ?,
@@ -78,7 +78,7 @@ exports.createmaster = async (req, res) => {
     } else {
       // Record does not exist, insert a new record
       const insertSql = `
-        INSERT INTO masterTabele (
+        INSERT INTO mastertabele (
           master_id,
           entityName,
           entityAddress,
@@ -135,7 +135,7 @@ exports.getmasterByname = (req, res) => {
   if (!entityName ) {
     return res.status(400).json({ error: "EntityName is required" });
   }
-const sql = "SELECT * FROM masterTabele WHERE entityName = ? AND visibility = 1";
+const sql = "SELECT * FROM mastertabele WHERE entityName = ? AND visibility = 1";
     
   db.query(sql, [entityName], (err, results) => {
     if (err) {

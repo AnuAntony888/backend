@@ -227,7 +227,7 @@ exports.login = (req, res) => {
 
           // Get entity name from mastertable
 
-          const sql = "SELECT * FROM masterTabele WHERE master_id = ?";
+          const sql = "SELECT * FROM mastertabele WHERE master_id = ?";
     
   db.query(sql, [user.master_id], (err, results) => {
     if (err) {

@@ -61,7 +61,7 @@ const dbConfig = {
   host: "localhost",
   port:3306,
   user: "vedahtee_smartbilling",
-  password: "Admin#2018@",
+  password: "CezmHV6qQ6}H",
   database: "vedahtee_smartbilling",
 };
 // const dbConfig = {
