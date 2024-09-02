@@ -55,12 +55,11 @@
 //     }
 //   }
 // };
-
  const mysql = require("mysql");
-// const mysql = require('mysql2');
+
 const dbConfig = {
   host: "localhost",
-  port: 3306,
+  port:3306,
   user: "vedahtee_smartbilling",
   password: "Admin#2018@",
   database: "vedahtee_smartbilling",
