@@ -168,7 +168,7 @@ const sql = "SELECT * FROM masterTabele WHERE entityName = ? AND visibility = 1"
 //   });
 // };
 exports.getAllMaster = async (req, res) => {
-  const sql = "SELECT * FROM masterTabele WHERE visibility = 1";
+  const sql = "SELECT * FROM mastertabele WHERE visibility = 1";
 
   try {
     const results = await new Promise((resolve, reject) => {
