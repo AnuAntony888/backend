@@ -1,8 +1,7 @@
 // const bcrypt = require("bcrypt");
 const bcrypt = require('bcryptjs');
-
-const db = require("../utils/db");
 const { v4: uuidv4 } = require("uuid");
+const db = require("../utils/db");
 const jwt = require("jsonwebtoken");
 
 const JWT_SECRET =
@@ -157,6 +156,11 @@ exports.signup = async (req, res) => {
     }
   );
 };
+
+
+
+
+
 
 exports.getAllUsers = (req, res) => {
   db.query("SELECT name, email, password FROM users", (err, results) => {

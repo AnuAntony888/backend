@@ -14,7 +14,7 @@ const categoryRoutes=require('./routes/categoryRoutes')
 const corsOptions = require("./config/cors");
 require("./config/createTables"); // Import and execute the table creation script
 const app = express();
-const port = 5000;
+ const port = 5000;
 
 // Use CORS middleware with options
 app.use(cors(corsOptions));
@@ -33,6 +33,12 @@ app.use("/api/category", categoryRoutes);
 // Route for root URL
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
 });
 
 app.listen(port, () => {
