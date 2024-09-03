@@ -46,7 +46,7 @@ app.get("/api/master", (req, res) => {
   //    ${process.env.DB_USER},
   //    ${process.env.DB_PASSWORD},
   //    ${process.env.DB_NAME},Welcome to the API!"`);
-  // res.json({ message: "Welcome to the API!" });
+   res.json({ message: "Welcome to the API!" });
 });
 
 // Error handling middleware
