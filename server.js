@@ -32,6 +32,11 @@ app.use("/api/master", masterRoutes);
 app.use("/api/category", categoryRoutes);
 // Route for root URL
 app.get("/", (req, res) => {
+  console.log(   process.env.DB_HOST,
+    process.env.DB_PORT || 3306,
+     process.env.DB_USER,
+     process.env.DB_PASSWORD,
+     process.env.DB_NAME,"details")
   res.send("Welcome to the API!");
 });
 app.get("/api/master", (req, res) => {
