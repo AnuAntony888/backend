@@ -40,7 +40,12 @@ app.get("/", (req, res) => {
      ${process.env.DB_NAME},Welcome to the API!"`);
 });
 app.get("/api/master", (req, res) => {
-  res.json({ message: "Welcome to the API!" });
+  res.send(`${process.env.DB_HOST}
+    ${process.env.DB_PORT || 3306},
+     ${process.env.DB_USER},
+     ${process.env.DB_PASSWORD},
+     ${process.env.DB_NAME},Welcome to the API!"`);
+  // res.json({ message: "Welcome to the API!" });
 });
 
 // Error handling middleware
