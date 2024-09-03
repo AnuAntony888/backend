@@ -32,7 +32,7 @@ app.use("/api/master", masterRoutes);
 app.use("/api/category", categoryRoutes);
 // Route for root URL
 app.get("/", (req, res) => {
-  res.send(   "details")
+ 
   res.send(`${process.env.DB_HOST}
     ${process.env.DB_PORT || 3306},
      ${process.env.DB_USER},
