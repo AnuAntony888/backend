@@ -80,7 +80,7 @@ const createTables = () => {
   `;
 
   const createIteamTable = `
-  CREATE TABLE IF NOT EXISTS iteamTabele (
+  CREATE TABLE IF NOT EXISTS iteamtabele (
   product_id VARCHAR(255) PRIMARY KEY,
     ItemCode VARCHAR(255) NOT NULL,
     ItemDescription VARCHAR(255) NOT NULL,    
@@ -107,7 +107,7 @@ const createTables = () => {
   // user_id VARCHAR(255),
 
   const createCustomerTable = `
-CREATE TABLE IF NOT EXISTS customerTabele (
+CREATE TABLE IF NOT EXISTS customertabele (
   customer_id VARCHAR(255) PRIMARY KEY,
   customerName VARCHAR(255) NOT NULL,
 customerContactNo VARCHAR(255) NOT NULL,
@@ -126,7 +126,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
     
   // `;
   const createInvoiceTable = `
-  CREATE TABLE IF NOT EXISTS Invoice (
+  CREATE TABLE IF NOT EXISTS invoice (
     invoice_id VARCHAR(255) PRIMARY KEY,
     invoice_no VARCHAR(255) NOT NULL,
      invoice_date VARCHAR(255) NOT NULL,
@@ -148,8 +148,8 @@ customerAddress VARCHAR(255) NOT NULL  ,
         master_id VARCHAR(255),
         visibility TINYINT DEFAULT 1,
     FOREIGN KEY (master_id) REFERENCES mastertabele(master_id),
-    FOREIGN KEY (customer_id) REFERENCES customerTabele(customer_id),
-    FOREIGN KEY (product_id) REFERENCES iteamTabele(product_id),
+    FOREIGN KEY (customer_id) REFERENCES customertabele(customer_id),
+    FOREIGN KEY (product_id) REFERENCES iteamtabele(product_id),
     FOREIGN KEY (employee_id) REFERENCES users(user_id)
   );
   `;
@@ -203,7 +203,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
       runQuery(createcategoryTable, "create category");
 
       //  runQuery(addVisibilityColumn, "alter suppliertabel");
-      // runQuery(additeamTabeleColumn, "alter suppliertabel");
+      // runQuery(additeamtabeleColumn, "alter suppliertabel");
         //  runQuery(addUsersTableColumn, "usermastervisiblity");
     }
   );

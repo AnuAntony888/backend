@@ -67,7 +67,7 @@ exports.createIteame = async (req, res) => {
 
         const categoryID = categoryRows[0].category_id;
 
-        const checkSql = `SELECT * FROM iteamTabele WHERE ItemCode = ? AND ItemSupplier = ?`;
+        const checkSql = `SELECT * FROM iteamtabele WHERE ItemCode = ? AND ItemSupplier = ?`;
         db.query(
           checkSql,
           [ItemCode, supplierID, categoryID],
@@ -87,7 +87,7 @@ exports.createIteame = async (req, res) => {
             }
 
             const insertSql = `
-          INSERT INTO iteamTabele (
+          INSERT INTO iteamtabele (
             product_id,
             ItemCode,
             ItemDescription,
@@ -265,7 +265,7 @@ exports.updateItem = (req, res) => {
   }
 
   // Check if ItemCode exists
-  const checkSql = `SELECT * FROM iteamTabele WHERE ItemCode = ?`;
+  const checkSql = `SELECT * FROM iteamtabele WHERE ItemCode = ?`;
   db.query(checkSql, [ItemCode], async (err, rows) => {
     if (err) {
       console.error("Error:", err);
@@ -276,7 +276,7 @@ exports.updateItem = (req, res) => {
 
     if (rows.length > 0) {
       const updateSql = `
-        UPDATE iteamTabele
+        UPDATE iteamtabele
         SET 
           ItemDescription = ?, 
           ItemUnit = ?, 
@@ -335,7 +335,7 @@ exports.deleteItem = (req, res) => {
 
   // Instead of deleting, update visibility to 0
   const updateSql =
-    "UPDATE iteamTabele SET visibility = ?,deleted_timestamp =?,deleted_by =? WHERE ItemCode = ?";
+    "UPDATE iteamtabele SET visibility = ?,deleted_timestamp =?,deleted_by =? WHERE ItemCode = ?";
   const values = [(visibility = 0), deleted_timestamp, deleted_by, ItemCode];
   db.query(updateSql, values, (err, result) => {
     if (err) {
@@ -431,7 +431,7 @@ exports.getAllItems = (req, res) => {
 
       // Step 2: Get items by supplier ID
       const getItemsSql =
-        "SELECT * FROM iteamTabele WHERE ItemSupplier = ? AND master_id = ? AND visibility = 1";
+        "SELECT * FROM iteamtabele WHERE ItemSupplier = ? AND master_id = ? AND visibility = 1";
       db.query(getItemsSql, [supplierID,master_id], (err, itemResults) => {
         if (err) {
           console.error("Database Error while fetching items:", err);

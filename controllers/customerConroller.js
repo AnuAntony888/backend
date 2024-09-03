@@ -27,7 +27,7 @@ exports.createCustomer = async (req, res) => {
         .json({ error: "All required fields must be provided" });
     }
 
-    const checkSql = `SELECT * FROM customerTabele WHERE customerContactNo = ?`;
+    const checkSql = `SELECT * FROM customertabele WHERE customerContactNo = ?`;
     db.query(checkSql, [customerContactNo], (err, rows) => {
       if (err) {
         console.error("Error:", err);
@@ -38,7 +38,7 @@ exports.createCustomer = async (req, res) => {
 
       if (rows.length > 0) {
         const updateSql = `
-          UPDATE customerTabele
+          UPDATE customertabele
           SET
             customerName = ?,
             customerTownCity = ?,
@@ -128,7 +128,7 @@ exports.getCustomerById = (req, res) => {
   if (!customerContactNo) {
     return res.status(400).json({ error: "customerContactNo is required" });
   }
-  const sql = "SELECT * FROM customerTabele WHERE customerContactNo = ?";
+  const sql = "SELECT * FROM customertabele WHERE customerContactNo = ?";
   db.query(sql, [customerContactNo], (err, results) => {
     if (err) {
       console.error("Database Error:", err);

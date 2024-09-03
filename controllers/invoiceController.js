@@ -53,7 +53,7 @@ exports.createinvoice = async (req, res) => {
 
     // Check if invoice_no already exists
     const checkInvoiceSql = `SELECT * FROM invoice WHERE invoice_no = ?`;
-    const existingInvoice = await new Promise((resolve, reject) => {
+    const existinginvoice = await new Promise((resolve, reject) => {
       db.query(checkInvoiceSql, [invoice_no], (err, result) => {
         if (err) {
           console.error("Error:", err);
@@ -219,7 +219,7 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
     const employee_id = invoiceDetails[0].employee_id;
 
     // Query to fetch customer details
-    const customerSql = `SELECT * FROM customerTabele WHERE customer_id = ?`;
+    const customerSql = `SELECT * FROM customertabele WHERE customer_id = ?`;
     const customerDetails = await new Promise((resolve, reject) => {
       db.query(customerSql, [customer_id], (err, result) => {
         if (err) {
@@ -256,7 +256,7 @@ exports.getInvoiceAndCustomerDetails = async (req, res) => {
     const productIds = invoiceDetails.map((invoice) => invoice.product_id);
 
     // Query to fetch product details for all product_ids
-    const productSql = `SELECT * FROM iteamTabele WHERE product_id IN (?)`;
+    const productSql = `SELECT * FROM iteamtabele WHERE product_id IN (?)`;
     const productDetails = await new Promise((resolve, reject) => {
       db.query(productSql, [productIds], (err, result) => {
         if (err) {
@@ -545,7 +545,7 @@ exports.updateInvoice = async (req, res) => {
 
     // Fetch existing invoice records for the given invoice_no
     const existingInvoices = await new Promise((resolve, reject) => {
-      const selectSql = `SELECT product_id FROM Invoice WHERE invoice_no = ?`;
+      const selectSql = `SELECT product_id FROM invoice WHERE invoice_no = ?`;
       db.query(selectSql, [invoice_no], (err, result) => {
         if (err) {
           console.error("Error:", err);
@@ -565,7 +565,7 @@ exports.updateInvoice = async (req, res) => {
       if (existingProductIds.includes(productIdsArray[i])) {
         // Update existing record
         const updateSql = `
-          UPDATE Invoice SET
+          UPDATE invoice SET
             invoice_date = ?,
             customer_id = ?,
             product_actual_total = ?,
@@ -612,7 +612,7 @@ exports.updateInvoice = async (req, res) => {
       } else {
         // Insert new record
         const insertSql = `
-          INSERT INTO Invoice (
+          INSERT INTO invoice (
           invoice_id,
             invoice_no,
             invoice_date,
@@ -665,7 +665,7 @@ exports.updateInvoice = async (req, res) => {
     for (let existingProductId of existingProductIds) {
       if (!productIdsArray.includes(existingProductId)) {
         const updateVisibilitySql = `
-          UPDATE Invoice SET
+          UPDATE invoice SET
             visibility = 0,
             updated_timestamp = CURRENT_TIMESTAMP
           WHERE invoice_no = ?
