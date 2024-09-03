@@ -32,19 +32,20 @@ app.use("/api/master", masterRoutes);
 app.use("/api/category", categoryRoutes);
 // Route for root URL
 app.get("/", (req, res) => {
- 
-  res.send(`${process.env.DB_HOST}
-    ${process.env.DB_PORT || 3306},
-     ${process.env.DB_USER},
-     ${process.env.DB_PASSWORD},
-     ${process.env.DB_NAME},Welcome to the API!"`);
+  res.send("welcom");
 });
+//   res.send(`${process.env.DB_HOST}
+//     ${process.env.DB_PORT || 3306},
+//      ${process.env.DB_USER},
+//      ${process.env.DB_PASSWORD},
+//      ${process.env.DB_NAME},Welcome to the API!"`);
+// });
 app.get("/api/master", (req, res) => {
-  res.send(`${process.env.DB_HOST}
-    ${process.env.DB_PORT || 3306},
-     ${process.env.DB_USER},
-     ${process.env.DB_PASSWORD},
-     ${process.env.DB_NAME},Welcome to the API!"`);
+  // res.send(`${process.env.DB_HOST}
+  //   ${process.env.DB_PORT || 3306},
+  //    ${process.env.DB_USER},
+  //    ${process.env.DB_PASSWORD},
+  //    ${process.env.DB_NAME},Welcome to the API!"`);
   // res.json({ message: "Welcome to the API!" });
 });
 
