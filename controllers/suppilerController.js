@@ -6,13 +6,13 @@ exports.createSupplier = async (req, res) => {
   try {
     // Clean up field names by trimming whitespace
     const supplier = {
-      user_id: uuidv4(), 
-    SupplierDescription : req.body.SupplierDescription ? req.body.SupplierDescription.trim() : '',
-      SupplierAddress: req.body.SupplierAddress ? req.body.SupplierAddress.trim() : '',
+      user_id: uuidv4(),
+      SupplierDescription: req.body.SupplierDescription || '',
+      SupplierAddress: req.body.SupplierAddress || '',
       visibility: 1,
- created_timestamp : req.body.created_timestamp ? req.body.created_timestamp.trim() : new Date().toISOString(),
- created_by : req.body.created_by ? req.body.created_by.trim() : 'unknown',
-      master_id: req.body.master_id ? req.body.master_id.trim() : '',
+      created_timestamp: req.body.created_timestamp || new Date().toISOString(),
+      created_by: req.body.created_by || 'unknown',
+      master_id: req.body.master_id || '',
 
       // SupplierDescription: req.body.SupplierDescription.trim(),
       // SupplierAddress: req.body.SupplierAddress.trim(),
@@ -158,12 +158,12 @@ exports.updateSupplier = (req, res) => {
     `;
 
   const values = [
-    SupplierDescription.trim(),
-    SupplierAddress.trim(),
+    SupplierDescription || '',
+    SupplierAddress || '',
     visibility !== undefined ? visibility : 1,
-    updated_timestamp ? updated_timestamp.trim() :  new Date().toISOString(),
-    updated_by ? updated_by.trim() : null,
-    master_id.trim(),
+    updated_timestamp || new Date().toISOString(),
+    updated_by || null,
+    master_id || '',
     SupplierCode,
   ];
 

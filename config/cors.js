@@ -1,11 +1,7 @@
 module.exports = {
-  origin: ["http://smartbilling.myurbancommunity.com","http://localhost:3000",
-     
-    
-  ],
-  
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: ["http://smartbilling.myurbancommunity.com", "http://localhost:3000"],
 
-    allowedHeaders: "Content-Type,Authorization"
-  };
-  
+  methods: ["GET", "POST", "PUT", "DELETE"],
+
+  allowedHeaders: "Content-Type,Authorization",
+};
