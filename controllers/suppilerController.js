@@ -1,26 +1,22 @@
 const { v4: uuidv4 } = require("uuid");
 const db = require("../utils/db"); // Ensure you have a proper db connection setup
 
-//creat supplier
+//create Supplier
 exports.createSupplier = async (req, res) => {
   try {
-    // Clean up field names by trimming whitespace
-    const supplier = {
-      user_id: uuidv4(),
-      SupplierDescription: req.body.SupplierDescription || '',
-      SupplierAddress: req.body.SupplierAddress || '',
-      visibility: 1,
-      created_timestamp: req.body.created_timestamp || new Date().toISOString(),
-      created_by: req.body.created_by || 'unknown',
-      master_id: req.body.master_id || '',
+    // Extract and clean up field values from req.body
+    const {
+      SupplierDescription,
+      SupplierAddress,
+      visibility = 1, // Default to 1 if not provided
+      created_timestamp = new Date().toISOString(),
+      created_by = 'unknown',
+      master_id,
+    } = req.body;
 
-      // SupplierDescription: req.body.SupplierDescription.trim(),
-      // SupplierAddress: req.body.SupplierAddress.trim(),
-      // visibility: 1, 
-      // created_timestamp: req.body.created_timestamp.trim(), 
-      // created_by: req.body.created_by.trim(), 
-      // master_id: req.body.master_id.trim(),
-    };
+    if (!SupplierDescription || !master_id) {
+      return res.status(400).json({ error: "SupplierDescription and master_id are required" });
+    }
 
     // Fetch the current maximum SupplierCode to determine the next code
     const getMaxCodeSql = `SELECT MAX(SupplierCode) AS maxCode FROM suppliers`;
@@ -46,20 +42,19 @@ exports.createSupplier = async (req, res) => {
 
     // Explicitly list column names with correct field names
     const sql = `
-      INSERT INTO suppliers (user_id, SupplierCode, SupplierDescription, SupplierAddress,visibility,created_timestamp,created_by,
-      master_id)
-      VALUES (?, ?, ?, ?,?,?,?,?)
+      INSERT INTO suppliers (user_id, SupplierCode, SupplierDescription, SupplierAddress, visibility, created_timestamp, created_by, master_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-      supplier.user_id,
+      uuidv4(), // Generate a new UUID for user_id
       newSupplierCode,
-      supplier.SupplierDescription,
-      supplier.SupplierAddress,
-      supplier.visibility,
-      supplier.created_timestamp,
-      supplier.created_by,
-      supplier.master_id,
+      SupplierDescription,
+      SupplierAddress || '', // Provide default empty string if not provided
+      visibility,
+      created_timestamp,
+      created_by,
+      master_id,
     ];
 
     // Use a Promise to handle the query asynchronously
@@ -68,7 +63,7 @@ exports.createSupplier = async (req, res) => {
         if (err) {
           console.error("Database Error:", err);
           console.error("SQL Query:", sql);
-          console.error("Supplier Data:", supplier);
+          console.error("Supplier Data:", values);
           return reject(err); // Reject the promise on error
         }
         resolve(result); // Resolve the promise on success
@@ -78,9 +73,7 @@ exports.createSupplier = async (req, res) => {
     res.status(201).json({ message: "Supplier added successfully" });
   } catch (err) {
     console.error("Error:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to add supplier", details: err.message });
+    res.status(500).json({ error: "Failed to add supplier", details: err.message });
   }
 };
 

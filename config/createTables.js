@@ -48,12 +48,12 @@ const createTables = () => {
       SupplierDescription VARCHAR(255) NOT NULL,
       SupplierAddress VARCHAR(255) NOT NULL ,
       visibility TINYINT DEFAULT 1,
-      created_timestamp VARCHAR(255) NOT NULL,
-      created_by VARCHAR(255) NOT NULL,
-      updated_timestamp VARCHAR(255) NOT NULL,
-      updated_by VARCHAR(255) NOT NULL,
-      deleted_timestamp VARCHAR(255) NOT NULL,
-      deleted_by VARCHAR(255) NOT NULL,
+     created_timestamp VARCHAR(255) DEFAULT NULL,
+  created_by VARCHAR(255) DEFAULT 'unknown',
+  updated_timestamp VARCHAR(255) DEFAULT NULL,
+  updated_by VARCHAR(255) DEFAULT 'unknown',
+  deleted_timestamp VARCHAR(255) DEFAULT NULL,
+  deleted_by VARCHAR(255) DEFAULT 'unknown',
       master_id VARCHAR(255),
       FOREIGN KEY (master_id) REFERENCES mastertabele(master_id) 
         );    
@@ -68,11 +68,11 @@ const createTables = () => {
       CategoryDescription VARCHAR(255) NOT NULL,
       visibility TINYINT DEFAULT 1,
      created_timestamp VARCHAR(255) NOT NULL,
-      created_by VARCHAR(255) NOT NULL,
-      updated_timestamp VARCHAR(255) NOT NULL,
-      updated_by VARCHAR(255) NOT NULL,
-      deleted_timestamp VARCHAR(255) NOT NULL,
-      deleted_by VARCHAR(255) NOT NULL,
+  created_by VARCHAR(255) DEFAULT 'unknown',
+  updated_timestamp VARCHAR(255) NOT NULL,
+  updated_by VARCHAR(255) DEFAULT 'unknown',
+  deleted_timestamp VARCHAR(255) NOT NULL,
+  deleted_by VARCHAR(255) DEFAULT 'unknown',
         master_id VARCHAR(255),
     FOREIGN KEY (master_id) REFERENCES mastertabele(master_id)
         );
@@ -92,12 +92,12 @@ const createTables = () => {
     IteamPrice DECIMAL(10, 2) NOT NULL,
     Iteamstock DECIMAL(10, 2) NOT NULL,
     visibility TINYINT DEFAULT 1,
-    created_timestamp VARCHAR(255) NOT NULL,
-      created_by VARCHAR(255) NOT NULL,
-      updated_timestamp VARCHAR(255) NOT NULL,
-      updated_by VARCHAR(255) NOT NULL,
-      deleted_timestamp VARCHAR(255) NOT NULL,
-      deleted_by VARCHAR(255) NOT NULL,
+   created_timestamp VARCHAR(255) DEFAULT NULL,
+  created_by VARCHAR(255) DEFAULT 'unknown',
+  updated_timestamp VARCHAR(255) DEFAULT NULL,
+  updated_by VARCHAR(255) DEFAULT 'unknown',
+  deleted_timestamp VARCHAR(255) DEFAULT NULL,
+  deleted_by VARCHAR(255) DEFAULT 'unknown',
         master_id VARCHAR(255),
     FOREIGN KEY (master_id) REFERENCES mastertabele(master_id),
     FOREIGN KEY (ItemSupplier) REFERENCES suppliers(user_id),
@@ -120,11 +120,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
     FOREIGN KEY (master_id) REFERENCES mastertabele(master_id)
 );
 `;
-  // const addUsersTableColumn = `
-  //   ALTER TABLE Invoice
-  //   ADD  visibility TINYINT DEFAULT 1,
-    
-  // `;
+ 
   const createInvoiceTable = `
   CREATE TABLE IF NOT EXISTS invoice (
     invoice_id VARCHAR(255) PRIMARY KEY,
@@ -139,12 +135,12 @@ customerAddress VARCHAR(255) NOT NULL  ,
     paymentmethod VARCHAR(255) NOT NULL,
     orderstatus VARCHAR(255) NOT NULL,
     employee_id VARCHAR(255) NOT NULL,
-  created_timestamp VARCHAR(255) NOT NULL,
-      created_by VARCHAR(255) NOT NULL,
-      updated_timestamp VARCHAR(255) NOT NULL,
-      updated_by VARCHAR(255) NOT NULL,
-      deleted_timestamp VARCHAR(255) NOT NULL,
-      deleted_by VARCHAR(255) NOT NULL,
+   created_timestamp VARCHAR(255) DEFAULT NULL,
+  created_by VARCHAR(255) DEFAULT 'unknown',
+  updated_timestamp VARCHAR(255) DEFAULT NULL,
+  updated_by VARCHAR(255) DEFAULT 'unknown',
+  deleted_timestamp VARCHAR(255) DEFAULT NULL,
+  deleted_by VARCHAR(255) DEFAULT 'unknown',
         master_id VARCHAR(255),
         visibility TINYINT DEFAULT 1,
     FOREIGN KEY (master_id) REFERENCES mastertabele(master_id),

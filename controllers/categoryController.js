@@ -2,18 +2,96 @@ const { v4: uuidv4 } = require("uuid");
 const db = require("../utils/db"); // Ensure you have a proper db connection setup
 
 // Create category
+// exports.createcategory = async (req, res) => {
+//   try {
+//     console.log("Received request with body:", req.body); // Log the request body
+
+//     const category = {
+//       category_id: uuidv4(), // Correctly named as category_id
+//       CategoryDescription: req.body.CategoryDescription.trim(),
+//       visibility: 1, // Set visibility to 1 for newly created category
+//       created_timestamp: req.body.created_timestamp.trim(), // Add created_timestamp
+//       created_by: req.body.created_by.trim(), // Add created_by
+//       master_id: req.body.master_id.trim(),
+//     };
+
+//     // Get the maximum CategoryCode from the database
+//     const getMaxCodeSql = `SELECT MAX(CategoryCode) AS maxCode FROM category`;
+
+//     const maxCodeResult = await new Promise((resolve, reject) => {
+//       db.query(getMaxCodeSql, (err, result) => {
+//         if (err) {
+//           console.error("Database Error:", err);
+//           return reject(err);
+//         }
+//         resolve(result[0].maxCode);
+//       });
+//     });
+
+//     // Generate the new CategoryCode
+//     let newCategoryCode = "000001"; // Default starting code
+//     if (maxCodeResult) {
+//       const maxCode = parseInt(maxCodeResult, 10);
+//       newCategoryCode = (maxCode + 1).toString().padStart(6, "0");
+//     }
+
+//     console.log("New CategoryCode:", newCategoryCode); // Log for debugging
+
+//     // Insert the new category into the database
+//     const sql = `
+//       INSERT INTO category (category_id, CategoryCode, CategoryDescription, visibility,
+//       created_timestamp, created_by,master_id)
+//       VALUES (?, ?, ?, ?,?,?,?)
+//     `;
+
+//     const values = [
+//       category.category_id,
+//       newCategoryCode,
+//       category.CategoryDescription,
+//       category.visibility,
+//       category.created_timestamp,
+//       category.created_by,
+//       category.master_id
+//     ];
+
+//     console.log("Executing SQL:", sql, "with values:", values); // Log SQL execution
+
+//     await new Promise((resolve, reject) => {
+//       db.query(sql, values, (err, result) => {
+//         if (err) {
+//           console.error("Database Error:", err);
+//           console.error("SQL Query:", sql);
+//           console.error("Category Data:", category);
+//           return reject(err); // Reject the promise on error
+//         }
+//         resolve(result); // Resolve the promise on success
+//       });
+//     });
+
+//     res.status(201).json({ message: "Category added successfully" });
+//   } catch (err) {
+//     console.error("Error:", err);
+//     res
+//       .status(500)
+//       .json({ error: "Failed to add category", details: err.message });
+//   }
+// };
+
+
 exports.createcategory = async (req, res) => {
   try {
-    console.log("Received request with body:", req.body); // Log the request body
+    // Extract and clean up field values from req.body
+    const {
+      CategoryDescription,
+      created_timestamp = new Date().toISOString(), // Default to current timestamp if not provided
+      created_by = 'unknown', // Default to 'unknown' if not provided
+      master_id
+    } = req.body;
 
-    const category = {
-      category_id: uuidv4(), // Correctly named as category_id
-      CategoryDescription: req.body.CategoryDescription.trim(),
-      visibility: 1, // Set visibility to 1 for newly created category
-      created_timestamp: req.body.created_timestamp.trim(), // Add created_timestamp
-      created_by: req.body.created_by.trim(), // Add created_by
-      master_id: req.body.master_id.trim(),
-    };
+    // Validate required fields
+    if (!CategoryDescription || !master_id) {
+      return res.status(400).json({ error: "CategoryDescription and master_id are required" });
+    }
 
     // Get the maximum CategoryCode from the database
     const getMaxCodeSql = `SELECT MAX(CategoryCode) AS maxCode FROM category`;
@@ -40,18 +118,18 @@ exports.createcategory = async (req, res) => {
     // Insert the new category into the database
     const sql = `
       INSERT INTO category (category_id, CategoryCode, CategoryDescription, visibility,
-      created_timestamp, created_by,master_id)
-      VALUES (?, ?, ?, ?,?,?,?)
+      created_timestamp, created_by, master_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-      category.category_id,
+      uuidv4(), // Generate a new UUID for category_id
       newCategoryCode,
-      category.CategoryDescription,
-      category.visibility,
-      category.created_timestamp,
-      category.created_by,
-      category.master_id
+      CategoryDescription,
+      1, // Set visibility to 1 for newly created category
+      created_timestamp,
+      created_by,
+      master_id
     ];
 
     console.log("Executing SQL:", sql, "with values:", values); // Log SQL execution
@@ -61,7 +139,7 @@ exports.createcategory = async (req, res) => {
         if (err) {
           console.error("Database Error:", err);
           console.error("SQL Query:", sql);
-          console.error("Category Data:", category);
+          console.error("Category Data:", values);
           return reject(err); // Reject the promise on error
         }
         resolve(result); // Resolve the promise on success
@@ -71,9 +149,7 @@ exports.createcategory = async (req, res) => {
     res.status(201).json({ message: "Category added successfully" });
   } catch (err) {
     console.error("Error:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to add category", details: err.message });
+    res.status(500).json({ error: "Failed to add category", details: err.message });
   }
 };
 
@@ -213,11 +289,17 @@ exports.updateCategory = (req, res) => {
 
   // Prepare values for the SQL query
   const values = [
-    CategoryDescription.trim(),
+    // CategoryDescription.trim(),
+    // visibility !== undefined ? visibility : 1,
+    // updated_timestamp ? updated_timestamp.trim() : null,
+    // updated_by ? updated_by.trim() : null,
+    // master_id ? master_id.trim() : null,
+    // CategoryCode
+      CategoryDescription||'',
     visibility !== undefined ? visibility : 1,
-    updated_timestamp ? updated_timestamp.trim() : null,
-    updated_by ? updated_by.trim() : null,
-    master_id ? master_id.trim() : null,
+    updated_timestamp || new Date().toISOString(),
+    updated_by || null,
+    master_id || '',
     CategoryCode
   ];
 
