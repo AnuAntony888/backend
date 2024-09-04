@@ -27,7 +27,7 @@ const app = express();
 // };
 // app.use(cors(corsOptions));
 app.use(cors({
-  origin: 'https://smartbilling.myurbancommunity.com', // Your frontend URL
+  origin: ['https://smartbilling.myurbancommunity.com', 'http://localhost:3000/'],// Your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE','HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
