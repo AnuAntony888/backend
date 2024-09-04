@@ -28,7 +28,7 @@ const corsOptions = {
 
   allowedHeaders: "Content-Type,Authorization",
 }
-app.use(cors(corsOptions));
+app.use("*",cors(corsOptions));
 app.use(bodyParser.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
