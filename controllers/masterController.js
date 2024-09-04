@@ -146,11 +146,11 @@ const sql = "SELECT * FROM mastertabele WHERE entityName = ? AND visibility = 1"
     if (results.length === 0) {
       return res.status(404).json({ error: "master not found" });
     }
-    const masterTabele = results[0];
+    const mastertabele = results[0];
     // res.status(200).json(supplier);
     res.status(200).json({
       message: "master details retrieved successfully",
-      masterTabele: masterTabele
+      masterTabele: mastertabele
     });
   });
 };
