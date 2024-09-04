@@ -19,16 +19,13 @@ const app = express();
 // Use CORS middleware with options
 
 const corsOptions = {
-  // origin: 'http://localhost:3001/',
-  // credentials: true,
-  // optionSuccessStatus: 200
-  origin: ["http://smartbilling.myurbancommunity.com", "http://localhost:3000"],
-
-  methods: ["GET", "POST", "PUT", "DELETE"],
-
-  allowedHeaders: "Content-Type,Authorization",
-}
-app.use("*",cors(corsOptions));
+  origin: ["http://smartbilling.myurbancommunity.com", "http://localhost:3000"], // Allowed origins
+  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  credentials: true, // Allow credentials (cookies, authorization headers)
+  optionsSuccessStatus: 204, // Some legacy browsers choke on 204
+};
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
