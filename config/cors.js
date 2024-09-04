@@ -1,10 +1,10 @@
 module.exports = {
-  origin: ["http://localhost:3000",
-     "https://backend-three-sepia.vercel.app",
-    "http://smartbilling.myurbancommunity.com"
+  origin: ["http://smartbilling.myurbancommunity.com","http://localhost:3000",
+     
+    
   ],
   
-    methods: ["GET,POST,PUT,DELETE"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
 
     allowedHeaders: "Content-Type,Authorization"
   };

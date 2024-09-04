@@ -6,13 +6,19 @@ exports.createSupplier = async (req, res) => {
   try {
     // Clean up field names by trimming whitespace
     const supplier = {
-      user_id: uuidv4(), // Generate unique user_id using uuidv4
-      SupplierDescription: req.body.SupplierDescription.trim(),
-      SupplierAddress: req.body.SupplierAddress.trim(),
-      visibility: 1, // Set visibility to 1 for newly created supplier
-      created_timestamp: req.body.created_timestamp.trim(), // Add created_timestamp
-      created_by: req.body.created_by.trim(), // Add created_by
-      master_id: req.body.master_id.trim(),
+      user_id: uuidv4(), 
+    SupplierDescription : req.body.SupplierDescription ? req.body.SupplierDescription.trim() : '',
+      SupplierAddress: req.body.SupplierAddress ? req.body.SupplierAddress.trim() : '',
+      visibility: 1,
+ created_timestamp : req.body.created_timestamp ? req.body.created_timestamp.trim() : new Date().toISOString(),
+ created_by : req.body.created_by ? req.body.created_by.trim() : 'unknown',
+ master_id : req.body.master_id ? req.body.master_id.trim() : '',
+      // SupplierDescription: req.body.SupplierDescription.trim(),
+      // SupplierAddress: req.body.SupplierAddress.trim(),
+      // visibility: 1, 
+      // created_timestamp: req.body.created_timestamp.trim(), 
+      // created_by: req.body.created_by.trim(), 
+      // master_id: req.body.master_id.trim(),
     };
 
     // Fetch the current maximum SupplierCode to determine the next code
