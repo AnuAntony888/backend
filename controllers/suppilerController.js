@@ -12,7 +12,8 @@ exports.createSupplier = async (req, res) => {
       visibility: 1,
  created_timestamp : req.body.created_timestamp ? req.body.created_timestamp.trim() : new Date().toISOString(),
  created_by : req.body.created_by ? req.body.created_by.trim() : 'unknown',
- master_id : req.body.master_id ? req.body.master_id.trim() : '',
+      master_id: req.body.master_id ? req.body.master_id.trim() : '',
+
       // SupplierDescription: req.body.SupplierDescription.trim(),
       // SupplierAddress: req.body.SupplierAddress.trim(),
       // visibility: 1, 
@@ -160,7 +161,7 @@ exports.updateSupplier = (req, res) => {
     SupplierDescription.trim(),
     SupplierAddress.trim(),
     visibility !== undefined ? visibility : 1,
-    updated_timestamp ? updated_timestamp.trim() : null,
+    updated_timestamp ? updated_timestamp.trim() :  new Date().toISOString(),
     updated_by ? updated_by.trim() : null,
     master_id.trim(),
     SupplierCode,
