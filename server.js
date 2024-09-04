@@ -26,7 +26,7 @@ const app = express();
 //   optionsSuccessStatus: 204
 // };
 // app.use(cors(corsOptions));
-app.use('*',cors({
+app.use(cors({
   origin: 'https://smartbilling.myurbancommunity.com', // Your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE','HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization']
