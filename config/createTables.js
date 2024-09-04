@@ -59,6 +59,11 @@ const createTables = () => {
         );    
   `;
 
+  const addssuppliers = `
+  ALTER TABLE suppliers
+MODIFY COLUMN updated_timestamp  VARCHAR(255) DEFAULT NULL,
+MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
+  `
 
   const createcategoryTable = `
 
@@ -78,7 +83,11 @@ const createTables = () => {
         );
     
   `;
-
+  const addUsersTableColumn = `
+  ALTER TABLE category
+MODIFY COLUMN updated_timestamp  VARCHAR(255) DEFAULT NULL,
+MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
+  `
   const createIteamTable = `
   CREATE TABLE IF NOT EXISTS iteamtabele (
   product_id VARCHAR(255) PRIMARY KEY,
@@ -150,7 +159,12 @@ customerAddress VARCHAR(255) NOT NULL  ,
   );
   `;
 
-  
+  const additeamtabele = `
+  ALTER TABLE iteamtabele
+MODIFY COLUMN updated_timestamp  VARCHAR(255) DEFAULT NULL,
+MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
+  `
+
 
   // Function to run the queries
   const runQuery = (query, successMessage, errorMessage, callback) => {
@@ -198,9 +212,9 @@ customerAddress VARCHAR(255) NOT NULL  ,
       );
       runQuery(createcategoryTable, "create category");
 
-      //  runQuery(addVisibilityColumn, "alter suppliertabel");
-      // runQuery(additeamtabeleColumn, "alter suppliertabel");
-        //  runQuery(addUsersTableColumn, "usermastervisiblity");
+      runQuery(additeamtabele, "additeamtabele");
+      runQuery(addssuppliers, "addssuppliers");
+         runQuery(addUsersTableColumn, "usermastervisiblity");
     }
   );
 };

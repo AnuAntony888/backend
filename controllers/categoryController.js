@@ -236,8 +236,8 @@ exports.deleteCategory = (req, res) => {
   const sql = "UPDATE category SET visibility = ? ,deleted_timestamp =?,deleted_by =?  WHERE CategoryCode = ?";
   const values = [
     (visibility = 0),
-    deleted_timestamp,
-    deleted_by,
+    deleted_timestamp || null,
+    deleted_by || null,
    CategoryCode,
   ];
   db.query(sql,values,  (err, result) => {

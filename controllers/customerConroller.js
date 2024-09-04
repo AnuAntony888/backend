@@ -71,7 +71,7 @@ exports.createCustomer = async (req, res) => {
         });
       } else {
         const insertSql = `
-          INSERT INTO customerTabele (
+          INSERT INTO customertabele (
             customer_id,
             customerName,
             customerContactNo,
@@ -138,11 +138,11 @@ exports.getCustomerById = (req, res) => {
     if (results.length === 0) {
       return res.status(404).json({ error: "customerContactNo not found" });
     }
-    const customerTabele = results[0];
+    const customertabele = results[0];
     // res.status(200).json(supplier);
     res.status(200).json({
       message: "customerContactNo details retrieved successfully",
-      customerTabele: customerTabele
+      customerTabele: customertabele
     });
   });
 };
