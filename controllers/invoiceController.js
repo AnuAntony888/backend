@@ -1,6 +1,216 @@
 const { v4: uuidv4 } = require("uuid");
 const db = require("../utils/db");
 
+// exports.createinvoice = async (req, res) => {
+//   try {
+//     const {
+//       invoice_no,
+//       invoice_date,
+//       customer_id,
+//       product_id,
+//       paymentmethod,
+//       product_actual_total,
+//       product_discounted_total,
+//       product_total,
+//       cartCount,
+//       orderstatus,
+//       employee_id,
+//       created_by,
+//       updated_by,
+//       master_id,
+//       visibility = 1,
+//       tax,
+//       totalWithTax,
+//       roundAmount
+      
+//     } = req.body;
+
+//     // Ensure required fields are present
+//     if (
+//       !invoice_no ||
+//       !invoice_date ||
+//       !customer_id ||
+//       !product_id ||
+//       !product_actual_total ||
+//       !product_discounted_total ||
+//       !product_total ||
+//       !cartCount ||
+//       !orderstatus ||
+//       !paymentmethod ||
+//       !employee_id
+//     ) {
+//       return res
+//         .status(400)
+//         .json({ error: "All required fields must be provided" });
+//     }
+
+//     // Parse JSON fields
+//     const productIdsArray = JSON.parse(product_id);
+//     const cartCountsArray = JSON.parse(cartCount);
+
+//     // Validate lengths of arrays
+//     if (productIdsArray.length !== cartCountsArray.length) {
+//       return res.status(400).json({
+//         error: "Mismatch in array lengths for products and their details",
+//       });
+//     }
+
+//     // Check if invoice_no already exists
+//     const checkInvoiceSql = `SELECT * FROM invoice WHERE invoice_no = ?`;
+//     const existinginvoice = await new Promise((resolve, reject) => {
+//       db.query(checkInvoiceSql, [invoice_no], (err, result) => {
+//         if (err) {
+//           console.error("Error:", err);
+//           reject(err);
+//         } else {
+//           resolve(result);
+//         }
+//       });
+//     });
+//     console.log(existinginvoice.length, "leng");
+//     if (existinginvoice.length > 0) {
+//       // Invoice exists, update the records
+//       const updateSql = `
+//         UPDATE invoice SET
+//           invoice_date = ?,
+//           customer_id = ?,
+//           product_id = ?,
+//           product_actual_total = ?,
+//           product_discounted_total = ?,
+//           product_total = ?,
+//           cartCount = ?,
+//           orderstatus = ?,
+//           paymentmethod = ?,
+//           employee_id = ?,
+//           updated_timestamp = CURRENT_TIMESTAMP,
+//            updated_by = ?,
+//               master_id = ? ,
+//               visibility = ?,
+//                  tax= ?,
+//       totalWithTax = ?,
+//       roundAmount = ?
+//         WHERE invoice_no = ?
+//           AND product_id = ?`;
+//       // console.log(productIdsArray.length,"productIdsArray.length")
+//       for (let i = 0; i < productIdsArray.length; i++) {
+//         const updateValues = [
+//           invoice_date,
+//           customer_id,
+//           productIdsArray[i],
+//           product_actual_total,
+//           product_discounted_total,
+//           product_total,
+//           cartCountsArray[i],
+//           orderstatus,
+//           paymentmethod,
+//           employee_id,
+//           updated_by,
+//           master_id,
+//           visibility,
+//           tax,
+//           totalWithTax,
+//           roundAmount,
+//           invoice_no,
+//           productIdsArray[i],
+//         ];
+//         // console.log("updateValues invoice:", updateSql, updateValues);
+//         // console.log(invoice_no, productIdsArray[i], "invoice");
+//         console.log(updateValues, "updatevalue");
+//         await new Promise((resolve, reject) => {
+//           db.query(updateSql, updateValues, (err, result) => {
+//             if (err) {
+//               console.error("Error:", err);
+//               reject(err);
+//             } else {
+//               // console.log(result,"result")
+//               resolve(result);
+//             }
+//           });
+//         });
+//       }
+
+//       res.status(200).json({ message: "Invoice updated successfully" });
+//     } else {
+//       // Invoice does not exist, insert new records
+//       const insertSql = `
+//         INSERT INTO invoice (
+//           invoice_id,
+//           invoice_no,
+//           invoice_date,
+//           customer_id,
+//           product_id,
+//           product_actual_total,
+//           product_discounted_total,
+//           product_total,
+//           cartCount,
+//           orderstatus,
+//           paymentmethod,
+//           employee_id,
+//           created_timestamp,
+//           created_by ,
+//           master_id ,
+//           visibility,
+//              tax,
+//       totalWithTax,
+//       roundAmount
+          
+//         )
+//         VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,CURRENT_TIMESTAMP, ?,?,?,?,?,?)`;
+
+//       for (let i = 0; i < productIdsArray.length; i++) {
+//         const insertValues = [
+//           uuidv4(), // Generate a new UUID for invoice_id
+//           invoice_no,
+//           invoice_date,
+//           customer_id,
+//           productIdsArray[i],
+
+//           product_actual_total,
+//           product_discounted_total,
+//           product_total,
+//           cartCountsArray[i],
+//           orderstatus,
+//           paymentmethod,
+//           employee_id,
+//           created_by,
+//           master_id,
+//           visibility,
+//           tax,
+//           totalWithTax,
+//           roundAmount
+
+
+//         ];
+//         console.log("insertValues invoice:", insertValues);
+//         await new Promise((resolve, reject) => {
+//           db.query(insertSql, insertValues, (err, result) => {
+//             if (err) {
+//               console.error("Error:", err);
+//               reject(err);
+//             } else {
+//               resolve(result);
+//             }
+//           });
+//         });
+//       }
+
+//       res.status(201).json({ message: "Invoice created successfully" });
+//     }
+//   } catch (err) {
+//     console.error("Error:", err);
+//     res
+//       .status(500)
+//       .json({ error: "Failed to process invoice", details: err.message });
+//   }
+// };
+
+
+
+
+
+
+// const { v4: uuidv4 } = require("uuid");
+
 exports.createinvoice = async (req, res) => {
   try {
     const {
@@ -19,9 +229,11 @@ exports.createinvoice = async (req, res) => {
       updated_by,
       master_id,
       visibility = 1,
+      tax,
+      totalWithTax,
+      roundAmount
     } = req.body;
 
-    // Ensure required fields are present
     if (
       !invoice_no ||
       !invoice_date ||
@@ -40,18 +252,15 @@ exports.createinvoice = async (req, res) => {
         .json({ error: "All required fields must be provided" });
     }
 
-    // Parse JSON fields
     const productIdsArray = JSON.parse(product_id);
     const cartCountsArray = JSON.parse(cartCount);
 
-    // Validate lengths of arrays
     if (productIdsArray.length !== cartCountsArray.length) {
       return res.status(400).json({
         error: "Mismatch in array lengths for products and their details",
       });
     }
 
-    // Check if invoice_no already exists
     const checkInvoiceSql = `SELECT * FROM invoice WHERE invoice_no = ?`;
     const existinginvoice = await new Promise((resolve, reject) => {
       db.query(checkInvoiceSql, [invoice_no], (err, result) => {
@@ -63,7 +272,7 @@ exports.createinvoice = async (req, res) => {
         }
       });
     });
-    console.log(existinginvoice.length, "leng");
+
     if (existinginvoice.length > 0) {
       // Invoice exists, update the records
       const updateSql = `
@@ -79,40 +288,79 @@ exports.createinvoice = async (req, res) => {
           paymentmethod = ?,
           employee_id = ?,
           updated_timestamp = CURRENT_TIMESTAMP,
-           updated_by = ?,
-              master_id = ? ,
-              visibility = ?
-        WHERE invoice_no = ?
-          AND product_id = ?`;
-      // console.log(productIdsArray.length,"productIdsArray.length")
+          updated_by = ?,
+          master_id = ?,
+          visibility = ?,
+          tax = ?,
+          totalWithTax = ?,
+          roundAmount = ?
+        WHERE invoice_no = ? AND product_id = ?`;
+
       for (let i = 0; i < productIdsArray.length; i++) {
+        const productId = productIdsArray[i];
+        const newCartCount = cartCountsArray[i];
+
+        // Fetch existing cartCount for the product in the current invoice
+        const fetchCartCountSql = `SELECT cartCount FROM invoice WHERE invoice_no = ? AND product_id = ?`;
+        const existingCartCountResult = await new Promise((resolve, reject) => {
+          db.query(fetchCartCountSql, [invoice_no, productId], (err, result) => {
+            if (err) {
+              console.error("Error:", err);
+              reject(err);
+            } else {
+              resolve(result);
+            }
+          });
+        });
+
+        const existingCartCount = existingCartCountResult.length > 0 ? existingCartCountResult[0].cartCount : 0;
+
+        // Update item stock based on cartCount difference
+        if (existingCartCount !== newCartCount) {
+          const stockDifference = existingCartCount - newCartCount;
+          const updateStockSql = `
+            UPDATE iteamTabele SET Iteamstock = Iteamstock + ?
+            WHERE product_id = ?`;
+
+          await new Promise((resolve, reject) => {
+            db.query(updateStockSql, [stockDifference, productId], (err, result) => {
+              if (err) {
+                console.error("Error updating stock:", err);
+                reject(err);
+              } else {
+                resolve(result);
+              }
+            });
+          });
+        }
+
         const updateValues = [
           invoice_date,
           customer_id,
-          productIdsArray[i],
+          productId,
           product_actual_total,
           product_discounted_total,
           product_total,
-          cartCountsArray[i],
+          newCartCount,
           orderstatus,
           paymentmethod,
           employee_id,
           updated_by,
           master_id,
           visibility,
+          tax,
+          totalWithTax,
+          roundAmount,
           invoice_no,
-          productIdsArray[i],
+          productId,
         ];
-        // console.log("updateValues invoice:", updateSql, updateValues);
-        // console.log(invoice_no, productIdsArray[i], "invoice");
-        console.log(updateValues, "updatevalue");
+
         await new Promise((resolve, reject) => {
           db.query(updateSql, updateValues, (err, result) => {
             if (err) {
               console.error("Error:", err);
               reject(err);
             } else {
-              // console.log(result,"result")
               resolve(result);
             }
           });
@@ -137,32 +385,56 @@ exports.createinvoice = async (req, res) => {
           paymentmethod,
           employee_id,
           created_timestamp,
-          created_by ,
-          master_id ,
-          visibility 
+          created_by,
+          master_id,
+          visibility,
+          tax,
+          totalWithTax,
+          roundAmount
         )
-        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,CURRENT_TIMESTAMP, ?,?,?)`;
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?)`;
 
       for (let i = 0; i < productIdsArray.length; i++) {
+        const productId = productIdsArray[i];
+        const cartCount = cartCountsArray[i];
+
+        // Decrease stock in iteamTabele
+        const updateStockSql = `
+          UPDATE iteamTabele SET Iteamstock = Iteamstock - ?
+          WHERE product_id = ?`;
+
+        await new Promise((resolve, reject) => {
+          db.query(updateStockSql, [cartCount, productId], (err, result) => {
+            if (err) {
+              console.error("Error updating stock:", err);
+              reject(err);
+            } else {
+              resolve(result);
+            }
+          });
+        });
+
         const insertValues = [
-          uuidv4(), // Generate a new UUID for invoice_id
+          uuidv4(),
           invoice_no,
           invoice_date,
           customer_id,
-          productIdsArray[i],
-
+          productId,
           product_actual_total,
           product_discounted_total,
           product_total,
-          cartCountsArray[i],
+          cartCount,
           orderstatus,
           paymentmethod,
           employee_id,
           created_by,
           master_id,
           visibility,
+          tax,
+          totalWithTax,
+          roundAmount,
         ];
-        console.log("insertValues invoice:", insertValues);
+
         await new Promise((resolve, reject) => {
           db.query(insertSql, insertValues, (err, result) => {
             if (err) {
@@ -179,9 +451,7 @@ exports.createinvoice = async (req, res) => {
     }
   } catch (err) {
     console.error("Error:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to process invoice", details: err.message });
+    res.status(500).json({ error: "Failed to process invoice", details: err.message });
   }
 };
 
@@ -389,9 +659,12 @@ exports.deleteInvoice = async (req, res) => {
   }
 };
 
+
+
 // exports.updateInvoice = async (req, res) => {
 //   try {
 //     const {
+//       invoice_id,
 //       invoice_no,
 //       invoice_date,
 //       customer_id,
@@ -406,6 +679,9 @@ exports.deleteInvoice = async (req, res) => {
 //       updated_by,
 //       master_id,
 //       visibility = 1,
+//       tax,
+//       totalWithTax,
+//       roundAmount
 //     } = req.body;
 
 //     // Ensure required fields are present
@@ -422,7 +698,9 @@ exports.deleteInvoice = async (req, res) => {
 //       !paymentmethod ||
 //       !employee_id
 //     ) {
-//       return res.status(400).json({ error: "All required fields must be provided" });
+//       return res
+//         .status(400)
+//         .json({ error: "All required fields must be provided" });
 //     }
 
 //     // Parse JSON fields
@@ -436,63 +714,173 @@ exports.deleteInvoice = async (req, res) => {
 //       });
 //     }
 
-//     // Update existing records
-//     for (let i = 0; i < productIdsArray.length; i++) {
-//       const updateSql = `
-//         UPDATE Invoice SET
-//           invoice_date = ?,
-//           customer_id = ?,
-//           product_actual_total = ?,
-//           product_discounted_total = ?,
-//           product_total = ?,
-//           cartCount = ?,
-//           orderstatus = ?,
-//           paymentmethod = ?,
-//           employee_id = ?,
-//           updated_timestamp = CURRENT_TIMESTAMP,
-//           updated_by = ?,
-//           master_id = ?,
-//           visibility = ?
-//         WHERE invoice_no = ?
-//           AND product_id = ?`;
-
-//       const updateValues = [
-//         invoice_date,
-//         customer_id,
-//         product_actual_total,
-//         product_discounted_total,
-//         product_total,
-//         cartCountsArray[i],
-//         orderstatus,
-//         paymentmethod,
-//         employee_id,
-//         updated_by,
-//         master_id,
-//         visibility,
-//         invoice_no,
-//         productIdsArray[i],
-//       ];
-
-//       console.log("updateValues invoice:", updateSql, updateValues);
-//       await new Promise((resolve, reject) => {
-//         db.query(updateSql, updateValues, (err, result) => {
-//           if (err) {
-//             console.error("Error:", err);
-//             reject(err);
-//           } else {
-//             resolve(result);
-//           }
-//         });
+//     // Fetch existing invoice records for the given invoice_no
+//     const existingInvoices = await new Promise((resolve, reject) => {
+//       const selectSql = `SELECT product_id FROM invoice WHERE invoice_no = ?`;
+//       db.query(selectSql, [invoice_no], (err, result) => {
+//         if (err) {
+//           console.error("Error:", err);
+//           reject(err);
+//         } else {
+//           resolve(result);
+//         }
 //       });
+//     });
+
+//     const existingProductIds = existingInvoices.map(
+//       (invoice) => invoice.product_id
+//     );
+
+//     // Update existing records or insert new ones
+//     for (let i = 0; i < productIdsArray.length; i++) {
+//       if (existingProductIds.includes(productIdsArray[i])) {
+//         // Update existing record
+//         const updateSql = `
+//           UPDATE invoice SET
+//             invoice_date = ?,
+//             customer_id = ?,
+//             product_actual_total = ?,
+//             product_discounted_total = ?,
+//             product_total = ?,
+//             cartCount = ?,
+//             orderstatus = ?,
+//             paymentmethod = ?,
+//             employee_id = ?,
+//             updated_timestamp = CURRENT_TIMESTAMP,
+//             updated_by = ?,
+//             master_id = ?,
+//             visibility = ?,
+//                tax = ?,
+//       totalWithTax = ?,
+//       roundAmount = ?
+//           WHERE invoice_no = ?
+//             AND product_id = ?`;
+
+//         const updateValues = [
+//           invoice_date,
+//           customer_id,
+//           product_actual_total,
+//           product_discounted_total,
+//           product_total,
+//           cartCountsArray[i],
+//           orderstatus,
+//           paymentmethod,
+//           employee_id,
+//           updated_by,
+//           master_id,
+//           visibility,
+//           tax,
+//           totalWithTax,
+//           roundAmount,
+//           invoice_no,
+//           productIdsArray[i],
+//         ];
+
+//         await new Promise((resolve, reject) => {
+//           db.query(updateSql, updateValues, (err, result) => {
+//             if (err) {
+//               console.error("Error:", err);
+//               reject(err);
+//             } else {
+//               resolve(result);
+//             }
+//           });
+//         });
+//       } else {
+//         // Insert new record
+//         const insertSql = `
+//           INSERT INTO invoice (
+//           invoice_id,
+//             invoice_no,
+//             invoice_date,
+//             customer_id,
+//             product_id,
+//             paymentmethod,
+//             product_actual_total,
+//             product_discounted_total,
+//             product_total,
+//             cartCount,
+//             orderstatus,
+//             employee_id,
+//             updated_by,
+//             master_id,
+//             visibility ,
+//             tax ,
+//             totalWithTax ,
+//             roundAmount 
+//           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)`;
+
+//         const insertValues = [
+//           uuidv4(),
+//           invoice_no,
+//           invoice_date,
+//           customer_id,
+//           productIdsArray[i],
+//           paymentmethod,
+//           product_actual_total,
+//           product_discounted_total,
+//           product_total,
+//           cartCountsArray[i],
+//           orderstatus,
+//           employee_id,
+//           updated_by,
+//           master_id,
+//           visibility,
+//           tax,
+//           totalWithTax,
+//           roundAmount
+//         ];
+
+//         await new Promise((resolve, reject) => {
+//           db.query(insertSql, insertValues, (err, result) => {
+//             if (err) {
+//               console.error("Error:", err);
+//               reject(err);
+//             } else {
+//               resolve(result);
+//             }
+//           });
+//         });
+//       }
+//     }
+
+//     // Set visibility to zero for products no longer in the updated list
+//     for (let existingProductId of existingProductIds) {
+//       if (!productIdsArray.includes(existingProductId)) {
+//         const updateVisibilitySql = `
+//           UPDATE invoice SET
+//             visibility = 0,
+//             updated_timestamp = CURRENT_TIMESTAMP
+//           WHERE invoice_no = ?
+//             AND product_id = ?`;
+
+//         const updateVisibilityValues = [invoice_no, existingProductId];
+
+//         await new Promise((resolve, reject) => {
+//           db.query(
+//             updateVisibilitySql,
+//             updateVisibilityValues,
+//             (err, result) => {
+//               if (err) {
+//                 console.error("Error:", err);
+//                 reject(err);
+//               } else {
+//                 resolve(result);
+//               }
+//             }
+//           );
+//         });
+//       }
 //     }
 
 //     res.status(200).json({ message: "Invoice updated successfully" });
 //   } catch (err) {
 //     console.error("Error:", err);
-//     res.status(500).json({ error: "Failed to update invoice", details: err.message });
+//     res
+//       .status(500)
+//       .json({ error: "Failed to update invoice", details: err.message });
 //   }
 // };
-
 exports.updateInvoice = async (req, res) => {
   try {
     const {
@@ -511,6 +899,9 @@ exports.updateInvoice = async (req, res) => {
       updated_by,
       master_id,
       visibility = 1,
+      tax,
+      totalWithTax,
+      roundAmount
     } = req.body;
 
     // Ensure required fields are present
@@ -545,7 +936,7 @@ exports.updateInvoice = async (req, res) => {
 
     // Fetch existing invoice records for the given invoice_no
     const existingInvoices = await new Promise((resolve, reject) => {
-      const selectSql = `SELECT product_id FROM invoice WHERE invoice_no = ?`;
+      const selectSql = `SELECT product_id, cartCount FROM invoice WHERE invoice_no = ?`;
       db.query(selectSql, [invoice_no], (err, result) => {
         if (err) {
           console.error("Error:", err);
@@ -562,9 +953,45 @@ exports.updateInvoice = async (req, res) => {
 
     // Update existing records or insert new ones
     for (let i = 0; i < productIdsArray.length; i++) {
-      if (existingProductIds.includes(productIdsArray[i])) {
-        // Update existing record
-        const updateSql = `
+      const productId = productIdsArray[i];
+      const newCartCount = cartCountsArray[i];
+
+      // Check if the product exists in the invoice
+      const existingInvoice = existingInvoices.find(
+        (invoice) => invoice.product_id === productId
+      );
+
+      if (existingInvoice) {
+        // Fetch existing cart count and adjust stock
+        const existingCartCount = existingInvoice.cartCount;
+
+        // If cart count has changed, update stock accordingly
+        if (existingCartCount !== newCartCount) {
+          const stockDifference = existingCartCount - newCartCount;
+
+          // Update stock in iteamTabele
+          const updateStockSql = `
+            UPDATE iteamTabele 
+            SET Iteamstock = Iteamstock + ? 
+            WHERE product_id = ?`;
+          await new Promise((resolve, reject) => {
+            db.query(
+              updateStockSql,
+              [stockDifference, productId],
+              (err, result) => {
+                if (err) {
+                  console.error("Error updating stock:", err);
+                  reject(err);
+                } else {
+                  resolve(result);
+                }
+              }
+            );
+          });
+        }
+
+        // Update the existing invoice record
+        const updateInvoiceSql = `
           UPDATE invoice SET
             invoice_date = ?,
             customer_id = ?,
@@ -578,9 +1005,11 @@ exports.updateInvoice = async (req, res) => {
             updated_timestamp = CURRENT_TIMESTAMP,
             updated_by = ?,
             master_id = ?,
-            visibility = ?
-          WHERE invoice_no = ?
-            AND product_id = ?`;
+            visibility = ?,
+            tax = ?,
+            totalWithTax = ?,
+            roundAmount = ?
+          WHERE invoice_no = ? AND product_id = ?`;
 
         const updateValues = [
           invoice_date,
@@ -588,21 +1017,24 @@ exports.updateInvoice = async (req, res) => {
           product_actual_total,
           product_discounted_total,
           product_total,
-          cartCountsArray[i],
+          newCartCount,
           orderstatus,
           paymentmethod,
           employee_id,
           updated_by,
           master_id,
           visibility,
+          tax,
+          totalWithTax,
+          roundAmount,
           invoice_no,
-          productIdsArray[i],
+          productId
         ];
 
         await new Promise((resolve, reject) => {
-          db.query(updateSql, updateValues, (err, result) => {
+          db.query(updateInvoiceSql, updateValues, (err, result) => {
             if (err) {
-              console.error("Error:", err);
+              console.error("Error updating invoice:", err);
               reject(err);
             } else {
               resolve(result);
@@ -610,10 +1042,10 @@ exports.updateInvoice = async (req, res) => {
           });
         });
       } else {
-        // Insert new record
+        // Insert new invoice record and reduce stock accordingly
         const insertSql = `
           INSERT INTO invoice (
-          invoice_id,
+            invoice_id,
             invoice_no,
             invoice_date,
             customer_id,
@@ -627,31 +1059,53 @@ exports.updateInvoice = async (req, res) => {
             employee_id,
             updated_by,
             master_id,
-            visibility
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            visibility,
+            tax,
+            totalWithTax,
+            roundAmount
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
         const insertValues = [
           uuidv4(),
           invoice_no,
           invoice_date,
           customer_id,
-          productIdsArray[i],
+          productId,
           paymentmethod,
           product_actual_total,
           product_discounted_total,
           product_total,
-          cartCountsArray[i],
+          newCartCount,
           orderstatus,
           employee_id,
           updated_by,
           master_id,
           visibility,
+          tax,
+          totalWithTax,
+          roundAmount
         ];
 
         await new Promise((resolve, reject) => {
           db.query(insertSql, insertValues, (err, result) => {
             if (err) {
-              console.error("Error:", err);
+              console.error("Error inserting invoice:", err);
+              reject(err);
+            } else {
+              resolve(result);
+            }
+          });
+        });
+
+        // Reduce stock in iteamTabele
+        const reduceStockSql = `
+          UPDATE iteamTabele 
+          SET Iteamstock = Iteamstock - ? 
+          WHERE product_id = ?`;
+        await new Promise((resolve, reject) => {
+          db.query(reduceStockSql, [newCartCount, productId], (err, result) => {
+            if (err) {
+              console.error("Error reducing stock:", err);
               reject(err);
             } else {
               resolve(result);
@@ -668,8 +1122,7 @@ exports.updateInvoice = async (req, res) => {
           UPDATE invoice SET
             visibility = 0,
             updated_timestamp = CURRENT_TIMESTAMP
-          WHERE invoice_no = ?
-            AND product_id = ?`;
+          WHERE invoice_no = ? AND product_id = ?`;
 
         const updateVisibilityValues = [invoice_no, existingProductId];
 

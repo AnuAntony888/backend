@@ -86,6 +86,21 @@ exports.createIteame = async (req, res) => {
               });
             }
 
+
+            let newStock;
+            if (existingItems.length > 0) {
+             const currentStock = existingItems[0].Iteamstock;         
+              if (Iteamstock === currentStock) {
+                newStock = Iteamstock;
+              } else {
+                newStock = currentStock + Iteamstock;
+              }
+              console.log(Iteamstock,newStock)
+              console.log("New stock value:", newStock);
+            } else {
+              newStock = Iteamstock; 
+            }
+
             const insertSql = `
           INSERT INTO iteamtabele (
             product_id,
@@ -99,9 +114,9 @@ exports.createIteame = async (req, res) => {
             IteamPrice,
             Iteamstock,
             visibility,
-         created_timestamp,
-      created_by,
-        master_id
+           created_timestamp,
+           created_by,
+           master_id
           )
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
         `;
@@ -115,7 +130,8 @@ exports.createIteame = async (req, res) => {
               ItemTax,
               IteamDiscount,
               IteamPrice,
-              Iteamstock,
+              newStock,
+              // Iteamstock,
               visibility,
               created_timestamp,
               created_by,
@@ -275,6 +291,23 @@ exports.updateItem = (req, res) => {
     }
 
     if (rows.length > 0) {
+
+     // Get the current stock value from the database
+      const currentStock = Number(rows[0].Iteamstock);
+      const providedStock = Number(Iteamstock);
+      // console.log(currentStock ,providedStock );
+
+  
+
+ let newStock;
+      if (providedStock === currentStock)
+      {
+         newStock = providedStock;
+      }
+      else {
+         newStock = currentStock + providedStock;
+      }
+      console.log(newStock);
       const updateSql = `
         UPDATE iteamtabele
         SET 
@@ -296,7 +329,8 @@ exports.updateItem = (req, res) => {
         ItemTax,
         IteamDiscount,
         IteamPrice,
-        Iteamstock,
+        // Iteamstock,
+         newStock ,
         visibility !== undefined ? visibility : 1,
         updated_timestamp ? updated_timestamp : null,
         updated_by ? updated_by : null,

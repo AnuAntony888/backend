@@ -139,7 +139,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
     product_id VARCHAR(255) NOT NULL,
     product_actual_total DECIMAL(10, 2),
     product_discounted_total DECIMAL(10, 2),
-    product_total DECIMAL(10, 2),
+    product_total DECIMAL(10, 2),    
     cartCount INT NOT NULL,
     paymentmethod VARCHAR(255) NOT NULL,
     orderstatus VARCHAR(255) NOT NULL,
@@ -164,7 +164,14 @@ customerAddress VARCHAR(255) NOT NULL  ,
 MODIFY COLUMN updated_timestamp  VARCHAR(255) DEFAULT NULL,
 MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
   `
+  const addinvoicetaxroundamount = `
+ALTER TABLE invoice
+ADD COLUMN IF NOT EXISTS tax DECIMAL(10, 2) DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS totalWithTax DECIMAL(10, 2) DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS roundAmount DECIMAL(10, 2) DEFAULT NULL;
 
+
+  `
 
   // Function to run the queries
   const runQuery = (query, successMessage, errorMessage, callback) => {
@@ -205,16 +212,18 @@ MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
         "Customer table created or already exists.",
         "Error creating Customer table."
       );
+ 
+      runQuery(createcategoryTable, "create category");
+
+      runQuery(additeamtabele, "additeamtabele");
+      runQuery(addssuppliers, "addssuppliers");
+      runQuery(addUsersTableColumn, "usermastervisiblity");
       runQuery(
         createInvoiceTable,
         "invoice table created or already exists.",
         "Error creating invoice table."
       );
-      runQuery(createcategoryTable, "create category");
-
-      runQuery(additeamtabele, "additeamtabele");
-      runQuery(addssuppliers, "addssuppliers");
-         runQuery(addUsersTableColumn, "usermastervisiblity");
+      runQuery(addinvoicetaxroundamount,"add in invoice tabe")
     }
   );
 };

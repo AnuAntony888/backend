@@ -16,15 +16,7 @@ require("./config/createTables"); // Import and execute the table creation scrip
 const app = express();
  const port = 5000;
 
-// Use CORS middleware with options
 
-// const corsOptions = {
-//   origin: "http://smartbilling.myurbancommunity.com", // Allowed origins
-//   methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
-
-//   credentials: true,
-//   optionsSuccessStatus: 204
-// };
 // app.use(cors(corsOptions));
 app.use(cors({
   origin: 'https://smartbilling.myurbancommunity.com', // Your frontend URL
