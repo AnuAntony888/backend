@@ -319,7 +319,7 @@ exports.createinvoice = async (req, res) => {
         if (existingCartCount !== newCartCount) {
           const stockDifference = existingCartCount - newCartCount;
           const updateStockSql = `
-            UPDATE iteamTabele SET Iteamstock = Iteamstock + ?
+            UPDATE iteamtabele SET Iteamstock = Iteamstock + ?
             WHERE product_id = ?`;
 
           await new Promise((resolve, reject) => {
@@ -400,7 +400,7 @@ exports.createinvoice = async (req, res) => {
 
         // Decrease stock in iteamTabele
         const updateStockSql = `
-          UPDATE iteamTabele SET Iteamstock = Iteamstock - ?
+          UPDATE iteamtabele SET Iteamstock = Iteamstock - ?
           WHERE product_id = ?`;
 
         await new Promise((resolve, reject) => {
@@ -971,7 +971,7 @@ exports.updateInvoice = async (req, res) => {
 
           // Update stock in iteamTabele
           const updateStockSql = `
-            UPDATE iteamTabele 
+            UPDATE iteamtabele 
             SET Iteamstock = Iteamstock + ? 
             WHERE product_id = ?`;
           await new Promise((resolve, reject) => {
@@ -1099,7 +1099,7 @@ exports.updateInvoice = async (req, res) => {
 
         // Reduce stock in iteamTabele
         const reduceStockSql = `
-          UPDATE iteamTabele 
+          UPDATE iteamtabele 
           SET Iteamstock = Iteamstock - ? 
           WHERE product_id = ?`;
         await new Promise((resolve, reject) => {
