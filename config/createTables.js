@@ -38,9 +38,6 @@ const createTables = () => {
     );
   `;
 
-  
-
-
   const createSuppliersTable = `
     CREATE TABLE IF NOT EXISTS suppliers (
       user_id VARCHAR(255) PRIMARY KEY,
@@ -63,7 +60,7 @@ const createTables = () => {
   ALTER TABLE suppliers
 MODIFY COLUMN updated_timestamp  VARCHAR(255) DEFAULT NULL,
 MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
-  `
+  `;
 
   const createcategoryTable = `
 
@@ -87,7 +84,7 @@ MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
   ALTER TABLE category
 MODIFY COLUMN updated_timestamp  VARCHAR(255) DEFAULT NULL,
 MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
-  `
+  `;
   const createIteamTable = `
   CREATE TABLE IF NOT EXISTS iteamtabele (
   product_id VARCHAR(255) PRIMARY KEY,
@@ -129,7 +126,7 @@ customerAddress VARCHAR(255) NOT NULL  ,
     FOREIGN KEY (master_id) REFERENCES mastertabele(master_id)
 );
 `;
- 
+
   const createInvoiceTable = `
   CREATE TABLE IF NOT EXISTS invoice (
     invoice_id VARCHAR(255) PRIMARY KEY,
@@ -152,6 +149,9 @@ customerAddress VARCHAR(255) NOT NULL  ,
   deleted_by VARCHAR(255) DEFAULT 'unknown',
         master_id VARCHAR(255),
         visibility TINYINT DEFAULT 1,
+tax DECIMAL(10, 2) DEFAULT NULL,
+ totalWithTax DECIMAL(10, 2) DEFAULT NULL,
+ roundAmount DECIMAL(10, 2) DEFAULT NULL,
     FOREIGN KEY (master_id) REFERENCES mastertabele(master_id),
     FOREIGN KEY (customer_id) REFERENCES customertabele(customer_id),
     FOREIGN KEY (product_id) REFERENCES iteamtabele(product_id),
@@ -163,15 +163,14 @@ customerAddress VARCHAR(255) NOT NULL  ,
   ALTER TABLE iteamtabele
 MODIFY COLUMN updated_timestamp  VARCHAR(255) DEFAULT NULL,
 MODIFY COLUMN deleted_timestamp  VARCHAR(255) DEFAULT NULL;
-  `
+  `;
   const addinvoicetaxroundamount = `
+
 ALTER TABLE invoice
-ADD COLUMN IF NOT EXISTS tax DECIMAL(10, 2) DEFAULT NULL,
-ADD COLUMN IF NOT EXISTS totalWithTax DECIMAL(10, 2) DEFAULT NULL,
-ADD COLUMN IF NOT EXISTS roundAmount DECIMAL(10, 2) DEFAULT NULL;
-
-
-  `
+MODIFY COLUMN tax DECIMAL(10, 2) DEFAULT NULL,
+MODIFY COLUMN totalWithTax DECIMAL(10, 2) DEFAULT NULL,
+MODIFY COLUMN roundAmount DECIMAL(10, 2) DEFAULT NULL;
+  `;
 
   // Function to run the queries
   const runQuery = (query, successMessage, errorMessage, callback) => {
@@ -212,7 +211,7 @@ ADD COLUMN IF NOT EXISTS roundAmount DECIMAL(10, 2) DEFAULT NULL;
         "Customer table created or already exists.",
         "Error creating Customer table."
       );
- 
+
       runQuery(createcategoryTable, "create category");
 
       runQuery(additeamtabele, "additeamtabele");
@@ -223,7 +222,7 @@ ADD COLUMN IF NOT EXISTS roundAmount DECIMAL(10, 2) DEFAULT NULL;
         "invoice table created or already exists.",
         "Error creating invoice table."
       );
-      runQuery(addinvoicetaxroundamount,"add in invoice tabe")
+      runQuery(addinvoicetaxroundamount, "add in invoice tabe");
     }
   );
 };

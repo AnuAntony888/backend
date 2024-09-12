@@ -11,7 +11,7 @@ const customerRoutes = require('./routes/customerRoutes')
 const invoiceRouters = require('./routes/invoiceRoutes');
 const masterRoutes = require('./routes/masterRoutes');
 const categoryRoutes=require('./routes/categoryRoutes')
-// const corsOptions = require("./config/cors");
+//  const corsOptions = require("./config/cors");
 require("./config/createTables"); // Import and execute the table creation script
 const app = express();
  const port = 5000;

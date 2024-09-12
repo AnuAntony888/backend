@@ -16,11 +16,8 @@ exports.createCustomer = async (req, res) => {
     // Validate required fields for inserting
     if (
       !customerName ||
-      !customerContactNo ||
-      !customerTownCity ||
-      !customerPin ||
-   
-      !customerAddress
+      !customerContactNo 
+ 
     ) {
       return res
         .status(400)
